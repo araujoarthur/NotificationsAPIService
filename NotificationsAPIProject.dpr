@@ -9,7 +9,8 @@ uses
   Configuration in 'src\Configuration.pas',
   Forms.ApplicationSettings in 'src\Forms.ApplicationSettings.pas' {frmAppSettings},
   Localization.Resources in 'src\Localization.Resources.pas',
-  Logging.Logger in 'src\Logging.Logger.pas';
+  Logging.Logger in 'src\Logging.Logger.pas',
+  NAPI.Utils in 'src\NAPI.Utils.pas';
 
 {$R *.res}
 

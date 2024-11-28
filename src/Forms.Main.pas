@@ -44,7 +44,8 @@ uses
   scStyledForm,
   scGPControls,
   Configuration,
-  Logging.Logger;
+  Logging.Logger,
+  NAPI.Utils;
 
 type
   TTickThread = class;
@@ -54,7 +55,6 @@ type
     Panel1: TPanel;
     btnStopServer: TButton;
     lblUptime: TLabel;
-    conn: TFDConnection;
     MainMenu1: TMainMenu;
     ools1: TMenuItem;
     DatabaseFiretest1: TMenuItem;
@@ -125,7 +125,6 @@ procedure TfrmMain.btnStartServerClick(Sender: TObject);
 begin
   try
     FTickThread := TTickThread.Create(Self, FServerState);
-    conn.Connected := True;
     FServerState.StartServer;
     FTickThread.Start;
     if FServerState.IsServerRunning() then
@@ -142,8 +141,6 @@ end;
 
 procedure TfrmMain.btnStopServerClick(Sender: TObject);
 begin
-  ShowMessage('Going Close Connection');
-  conn.Close;
   ShowMessage('Connection Closed. Going to Stop Server');
   FServerState.StopServer;
   ShowMessage('Connection Closed. Going to Stop Server');
@@ -156,7 +153,6 @@ begin
 
   if not FServerState.IsServerRunning() then
   begin
-    conn.Connected := False;
     btnStartServer.Enabled := True;
     btnStopServer.Enabled := False;
   end;
@@ -164,26 +160,31 @@ end;
 
 procedure TfrmMain.DatabaseFiretest1Click(Sender: TObject);
 begin
+  var conn: TFDConnection := UtilFactory.GetConnection();
   try
-    conn.Connected := True;
-    if conn.Connected then
-    begin
-      conn.Connected := False;
-      WriteLog(TLogSeverities.Information, Format(RES_LOG_STRING, [RES_APPLICATION_LOG, Now().ToString(), RES_DATABASE_FIRETEST_SUCCESSFUL]));
-    end;
+    try
+      conn.Connected := True;
+      if conn.Connected then
+      begin
+        conn.Connected := False;
+        WriteLog(TLogSeverities.Information, Format(RES_LOG_STRING, [RES_APPLICATION_LOG, Now().ToString(), RES_DATABASE_FIRETEST_SUCCESSFUL]));
+      end;
 
-  except on E: Exception do
-    WriteLog(TLogSeverities.Error, Format(RES_LOG_STRING, [RES_APPLICATION_LOG, Now().ToString(), Format(RES_DATABASE_ERROR, [E.Message])]));
+    except on E: Exception do
+      WriteLog(TLogSeverities.Error, Format(RES_LOG_STRING, [RES_APPLICATION_LOG, Now().ToString(), Format(RES_DATABASE_ERROR, [E.Message])]));
+    end;
+  finally
+    conn.Free;
   end;
+
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   SetupLocalization();
   ConfigurationData := TNSConfiguration.Create();
-  ConfigurationData.LoadDBConfigIntoConnection(conn);
   SetupTrayIcon;
-  FServerState := TAPINotificationServerState.Create(conn);
+  FServerState := TAPINotificationServerState.Create();
   FServerState.RegisterResources();
 
   var LogTarg: TLoggingTarget;
@@ -211,8 +212,6 @@ begin
   begin
     FServerState.DisableSSL;
   end;
-
-  ConfigurationData.LoadDBConfigIntoConnection(conn);
 
 end;
 

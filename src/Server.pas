@@ -9,7 +9,7 @@ uses Vcl.StdCtrls, DateUtils, SysUtils, System.JSON, System.IOUtils,
   FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client,
   FireDAC.Phys.FB, FireDAC.Phys.FBDef, Vcl.Menus, Vcl.ComCtrls, FireDAC.Stan.Param,
   FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet,
-  Horse, Horse.Jhonson, IdSSLOpenSSL, Configuration, Logging.Logger;
+  Horse, Horse.Jhonson, IdSSLOpenSSL, Configuration, Logging.Logger, NAPI.Utils;
 
 resourcestring
   SCERTIFICATE_EXT = '.crt';
@@ -35,14 +35,13 @@ type
     FResourcesRegistered: Boolean;
     FStartedDate: TDateTime;
     FMinimumLogLevel: Integer;
-    FConnection: TFDConnection;
     FLogger: TLogger;
     procedure MercadoLibreNotify(AReq: THorseRequest; ARes: THorseResponse; ANext: TProc);
     procedure RegisterMercadoLibreNotification(ABody: TMLNotification);
     procedure NotificationServices(AReq: THorseRequest; ARes: THorseResponse; ANext: TProc);
     function ExtensionFileExistsOnFolder(AExt: String): Boolean;
   public
-    constructor Create(AConn: TFDConnection);
+    constructor Create();
     destructor Destroy(); override;
     procedure RegisterResources;
     function WithPort(APort: Integer): TAPINotificationServerState;
@@ -80,13 +79,12 @@ begin
   end;
 end;
 
-constructor TAPINotificationServerState.Create(AConn: TFDConnection);
+constructor TAPINotificationServerState.Create();
 begin
   FPort := DEFAULT_SERVER_PORT;
   FStartedDate := 0;
   FMinimumLogLevel := DEFAULT_MIN_LOG_LEVEL;
   FResourcesRegistered := False;
-  FConnection := AConn;
   THorse.Use(Jhonson());
   THorse.KeepConnectionAlive := False;
   FLogger := ApplicationLogger;
@@ -156,11 +154,11 @@ begin
   DateFormatSettings.DateSeparator :='-';
   DateFormatSettings.ShortDateFormat := 'YYYY-MM-DD';
   Query := TFDQuery.Create(nil);
-  Connection := TFDConnection(FConnection.CloneConnection());
-  Query.Connection := Connection;
-  FConnection.StartTransaction();
+  Connection := UtilFactory.GetConnection();
   try
-      Query.SQL.Text := 'INSERT INTO ML_NOTIFICACOES(ID_API, RESOURCE, USER_ID, TOPIC, APPLICATION_ID, ATTEMPTS, SENT, RECEIVED)VALUES('
+    Query.Connection := Connection;
+    Connection.StartTransaction();
+    Query.SQL.Text := 'INSERT INTO ML_NOTIFICACOES(ID_API, RESOURCE, USER_ID, TOPIC, APPLICATION_ID, ATTEMPTS, SENT, RECEIVED)VALUES('
     + QUOTE_MARK + ABody.ID_API + QUOTE_MARK + ','
     + QUOTE_MARK + ABody.Resource + QUOTE_MARK + ','
     + IntToStr(ABody.USER_ID) + ','
@@ -173,22 +171,21 @@ begin
 
     try
       Query.ExecSQL();
-      FConnection.Commit;
+      Connection.Commit;
       if Query.RowsAffected <> 0 then
         WriteLog(TLogSeverities.Information, 'Notification ['+ABody.ID_API+'] Inserted')
       else
-        WriteLog(TLogSeverities.Warning, 'Notification ['+ABody.ID_API+'] >NOT< Inserted')
+        WriteLog(TLogSeverities.Unknown, 'Notification ['+ABody.ID_API+'] >NOT< Inserted')
     except on E: Exception do
     begin
-      FConnection.Rollback;
+      Connection.Rollback;
       WriteLog(TLogSeverities.Error, Format(RES_ERROR_ON_DATA_INSERT, [E.Message]));
-    end;
     end
+    end;
   finally
     Query.Free;
     Connection.Free;
   end;
-
 end;
 
 procedure TAPINotificationServerState.RegisterResources;
@@ -213,6 +210,7 @@ end;
 function TAPINotificationServerState.WithLog(AViewer: TLoggingTarget;
   ALevel: Integer): TAPINotificationServerState;
 begin
+  Result := Self;
   FLogger.Target.RegisterTarget(AViewer.Target, AViewer.TargetType);
   FLogger.Active := True;
 

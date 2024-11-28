@@ -146,6 +146,7 @@
         </DCCReference>
         <DCCReference Include="src\Localization.Resources.pas"/>
         <DCCReference Include="src\Logging.Logger.pas"/>
+        <DCCReference Include="src\NAPI.Utils.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

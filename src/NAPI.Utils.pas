@@ -39,11 +39,22 @@ type
       logError = TColor($0000bf);
   end;
 
-  UtilFactory = record
+  UtilFactory = record  // In a future not that far I will need to change this for a connection pool.
     // The user is responsible for freeing this.
     class function GetConnection(): TFDConnection; static;
   end;
 
 implementation
+
+uses
+  Forms.Main;
+{ UtilFactory }
+
+class function UtilFactory.GetConnection: TFDConnection;
+begin
+  Result := TFDConnection.Create(frmMain);
+  ConfigurationData.LoadDBConfigIntoConnection(Result);
+
+end;
 
 end.

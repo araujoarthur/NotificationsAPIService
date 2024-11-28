@@ -200,16 +200,6 @@ object frmMain: TfrmMain
     ExplicitTop = 128
     ExplicitHeight = 153
   end
-  object conn: TFDConnection
-    Params.Strings = (
-      'Protocol='
-      'DriverID=FB'
-      'User_Name=sysdba'
-      'Password=masterkey')
-    TxOptions.DisconnectAction = xdNone
-    Left = 520
-    Top = 8
-  end
   object MainMenu1: TMainMenu
     Left = 464
     Top = 8
