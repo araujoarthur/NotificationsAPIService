@@ -98,7 +98,7 @@ object frmMain: TfrmMain
     end
   end
   object TrayIcon1: TTrayIcon
-    Left = 336
-    Top = 136
+    Left = 392
+    Top = 8
   end
 end

@@ -49,6 +49,9 @@ type
     Panel8: TPanel;
     lblMinLogLevel: TLabel;
     cbxMinimumLogLevel: TComboBox;
+    Panel11: TPanel;
+    lbl_MAX_CONCURRENT_CON: TLabel;
+    edtMaxConcurrentConnections: TEdit;
     procedure btnLoadFileSCrtClick(Sender: TObject);
     procedure btnLoadFileRCrtClick(Sender: TObject);
     procedure btnLoadKeyFileClick(Sender: TObject);
@@ -135,6 +138,7 @@ begin
   edtPort.Text := IntToStr(ConfigurationData.Port);
   cbSSL.Checked := ConfigurationData.SSL;
   gbSSL.Enabled := ConfigurationData.SSL;
+  edtMaxConcurrentConnections.Text := IntToStr(ConfigurationData.MaxConcurrentConnections);
   edtCertificatePath.Text := ConfigurationData.SSLConfig.CertificatePath;
   edtRootCertificatePath.Text := ConfigurationData.SSLConfig.RootCertificatePath;
   edtKeyFile.Text := ConfigurationData.SSLConfig.CertificateKey;
@@ -144,6 +148,7 @@ begin
   edtDBUser.Text := ConfigurationData.DBParams.Username;
   edtDBPass.Text := ConfigurationData.DBParams.Password;
   edtDBPort.Text := IntToStr(ConfigurationData.DBParams.Port);
+
 end;
 
 procedure TfrmAppSettings.LoadCertificateFile(Target: TEdit);
@@ -213,6 +218,7 @@ begin
   lblKeyFilePath.Caption := RES_KEY_FILE;
   Self.Caption := RES_SETTINGS;
   btnSaveConfiguration.Caption := RES_SAVE;
+  lbl_MAX_CONCURRENT_CON.Caption := RES_MAX_CONCURRENT_CONNECTIONS;
 end;
 
 end.

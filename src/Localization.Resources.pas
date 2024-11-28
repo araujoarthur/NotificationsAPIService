@@ -33,6 +33,7 @@ resourcestring
   RES_OPEN = 'Abrir';
   RES_EXCEPTION_FILE_DOESNT_EXIST = 'O Arquivo Não Existe';
   RES_DISCARD_CHAGNES_QUERY = 'Você quer descartar todas as modificações?';
+  RES_MAX_CONCURRENT_CONNECTIONS = 'Conexões Simultâneas';
 
 
 // MAIN FORM

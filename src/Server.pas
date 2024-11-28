@@ -51,6 +51,7 @@ type
     function WithPort(APort: Integer): TAPINotificationServerState;
     function WithLoggingViewer(AMemo: TMemo): TAPINotificationServerState;
     function WithMinimumLogLevel(ALogLevel: Integer): TAPINotificationServerState;
+    function WithMaximumConnections(AConns: Integer): TAPINotificationServerState;
     function TryWithSSL(): TAPINotificationServerState;
     function DisableSSL(): TAPINotificationServerState;
     procedure StartServer();
@@ -84,13 +85,14 @@ end;
 
 constructor TAPINotificationServerState.Create(AConn: TFDConnection);
 begin
-  FPort := 8080;
+  FPort := DEFAULT_SERVER_PORT;
   FLoggingViewer := nil;
   FStartedDate := 0;
-  FMinimumLogLevel := 1;
+  FMinimumLogLevel := DEFAULT_MIN_LOG_LEVEL;
   FResourcesRegistered := False;
   FConnection := AConn;
   THorse.Use(Jhonson());
+  THorse.KeepConnectionAlive := False;
 end;
 
 destructor TAPINotificationServerState.Destroy;
@@ -107,21 +109,28 @@ begin
   Result := Self;
 end;
 
+// TO-DO: FIX THE ERROR HAPPENING ON FDCONNECTION. MAYBE BY LOOPING UNTIL THE INSERTION IS SUCCESSFUL, MAYBE
+// MAKING THE FDCONNECTION POOLED.
 procedure TAPINotificationServerState.MercadoLibreNotify(
   AReq: THorseRequest; ARes: THorseResponse; ANext: TProc);
 var
   BodyAdapter: TMLNotification;
   LBody: TJSONObject;
 begin
-  LBody := AReq.Body<TJSONObject>;
-  {LOGGING}
-  WriteLog(lsREQUEST, Format(RES_MERCADOLIVRE_RECEIVED_NOTIFICATION, ['MercadoLivre']));
-  WriteLog(lsREQUESTBODY, LBody.ToString());
+  ARes.Status(200).Send('ok'); {EARLY RESPONSE TO GAIN TIME}
+  WriteLog(lsREQUEST, Format(RES_MERCADOLIVRE_RECEIVED_NOTIFICATION, ['MercadoLivre'])); {LOGGING}
+  try
+    LBody := AReq.Body<TJSONObject>;
 
-  {FUNCTION BODY}
-  BodyAdapter := TMLNotification.FromJSONObject(LBody);
-  ARes.Status(200).Send('ok');
-  RegisterMercadoLibreNotification(BodyAdapter);
+    WriteLog(lsREQUESTBODY, LBody.ToString()); {LOGGING}
+
+    {FUNCTION BODY}
+    BodyAdapter := TMLNotification.FromJSONObject(LBody);
+    RegisterMercadoLibreNotification(BodyAdapter);
+  except on E: Exception do
+    WriteLog(lsERROR, E.Message);
+  end;
+
 end;
 
 procedure TAPINotificationServerState.NotificationServices(AReq: THorseRequest;
@@ -175,8 +184,8 @@ end;
 
 procedure TAPINotificationServerState.RegisterResources;
 begin
-  THorse.Get('/notificationServices', NotificationServices);
-  THorse.Post('/notificationServices/mercadoLibreNotify', MercadoLibreNotify);
+  THorse.Get('/', NotificationServices);
+  THorse.Post('/ml', MercadoLibreNotify);
 end;
 
 procedure TAPINotificationServerState.StopServer;
@@ -198,6 +207,13 @@ begin
   FLoggingViewer := AMemo;
   WriteLog(lsINFORMATION, RES_LOGGING_VIEWER_SET);
   Result := Self;
+end;
+
+function TAPINotificationServerState.WithMaximumConnections(
+  AConns: Integer): TAPINotificationServerState;
+begin
+  Result := Self;
+  THorse.MaxConnections := AConns;
 end;
 
 function TAPINotificationServerState.WithMinimumLogLevel(

@@ -34,6 +34,7 @@ type
     FMinimumLogLevel: Integer;
     FDBConfig: TNSDBConfig;
     FSSLConfig: TNSSSLConfig;
+    FMaxConcurrentConnections: Integer;
   private
     function FileExistsOnFolder(AFileName: String): Boolean;
     procedure LoadFromFile(AFileName: String);
@@ -41,6 +42,7 @@ type
     constructor Create();
     procedure Save();
     procedure LoadDBConfigIntoConnection(const AConn: TFDConnection);
+    property MaxConcurrentConnections: Integer read FMaxConcurrentConnections write FMaxConcurrentConnections;
     property Port: Integer read FPort write FPort;
     property SSL: Boolean read FWithSSL write FWithSSL;
     property SSLConfig: TNSSSLConfig read FSSLConfig write FSSLConfig;
@@ -57,6 +59,7 @@ const
 
   DEFAULT_SERVER_PORT = 5000;
   DEFAULT_SSL_USAGE = False;
+  DEFAULT_MAX_CONCURRENT_CONNECTIONS = 100;
 
   DEFAULT_MIN_LOG_LEVEL = 0;
   DEFAULT_DB_USER = 'sysdba';
@@ -64,6 +67,7 @@ const
   DEFAULT_DB_HOST = '127.0.0.1';
   DEFAULT_DB_PORT = -1;
   DEFAULT_DB_FILE = 'DB.FDB';
+
 
   DEFAULT_SSL_ROOTCERTNAME = '';
   DEFAULT_SSL_CERTNAME = '';
@@ -104,6 +108,7 @@ begin
     var IniFile: TIniFile := TIniFile.Create(CONFIG_FILE_PATH);
     IniFile.WriteInteger(GENERAL_SECTION_NAME,'Port', DEFAULT_SERVER_PORT);
     IniFile.WriteBool(GENERAL_SECTION_NAME, 'SSL', DEFAULT_SSL_USAGE);
+    IniFile.WriteInteger(GENERAL_SECTION_NAME, 'MaxConcurrentConnections', DEFAULT_MAX_CONCURRENT_CONNECTIONS);
 
     IniFile.WriteInteger(GENERAL_SECTION_NAME, 'MinimumLogLevel', DEFAULT_MIN_LOG_LEVEL);
     IniFile.WriteString(DATABASE_SECTION_NAME, 'Username', DEFAULT_DB_USER);
@@ -159,6 +164,7 @@ begin
   FWithSSL := IniFile.ReadBool(GENERAL_SECTION_NAME, 'SSL', DEFAULT_SSL_USAGE);
   FMinimumLogLevel := IniFile.ReadInteger(GENERAL_SECTION_NAME, 'MinimumLogLevel', DEFAULT_MIN_LOG_LEVEL);
 
+  FMaxConcurrentConnections := IniFile.ReadInteger(GENERAL_SECTION_NAME, 'MaxConcurrentConnections', DEFAULT_MAX_CONCURRENT_CONNECTIONS);
   FDBConfig.Username := IniFile.ReadString(DATABASE_SECTION_NAME, 'Username',  '');
   FDBConfig.Password := IniFile.ReadString(DATABASE_SECTION_NAME, 'Password', DEFAULT_DB_PASS);
   FDBConfig.Host := IniFile.ReadString(DATABASE_SECTION_NAME, 'Host', DEFAULT_DB_HOST);
@@ -178,6 +184,7 @@ begin
   IniFile.WriteInteger(GENERAL_SECTION_NAME,'Port', FPort);
   IniFile.WriteBool(GENERAL_SECTION_NAME, 'SSL', FWithSSL);
   IniFile.WriteInteger(GENERAL_SECTION_NAME, 'MinimumLogLevel', FMinimumLogLevel);
+  IniFile.WriteInteger(GENERAL_SECTION_NAME, 'MaxConcurrentConnections', FMaxConcurrentConnections);
 
   IniFile.WriteString(DATABASE_SECTION_NAME, 'Username', FDBConfig.Username);
   IniFile.WriteString(DATABASE_SECTION_NAME, 'Password', FDBConfig.Password);

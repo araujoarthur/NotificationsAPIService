@@ -3,8 +3,8 @@ object frmAppSettings: TfrmAppSettings
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'Settings'
-  ClientHeight = 596
-  ClientWidth = 324
+  ClientHeight = 635
+  ClientWidth = 329
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,8 +21,8 @@ object frmAppSettings: TfrmAppSettings
     AlignWithMargins = True
     Left = 10
     Top = 5
-    Width = 304
-    Height = 132
+    Width = 309
+    Height = 172
     Margins.Left = 0
     Margins.Top = 5
     Margins.Right = 0
@@ -40,11 +40,12 @@ object frmAppSettings: TfrmAppSettings
     ParentFont = False
     ShowFrame = False
     TabOrder = 0
+    ExplicitWidth = 304
     object cbSSL: TCheckBox
       AlignWithMargins = True
       Left = 17
       Top = 64
-      Width = 270
+      Width = 275
       Height = 17
       Margins.Left = 15
       Margins.Top = 4
@@ -62,11 +63,12 @@ object frmAppSettings: TfrmAppSettings
       ParentFont = False
       TabOrder = 1
       OnClick = cbSSLClick
+      ExplicitWidth = 270
     end
     object Panel1: TPanel
       Left = 2
       Top = 19
-      Width = 300
+      Width = 305
       Height = 41
       Align = alTop
       BevelOuter = bvNone
@@ -78,6 +80,7 @@ object frmAppSettings: TfrmAppSettings
       ParentFont = False
       ShowCaption = False
       TabOrder = 0
+      ExplicitWidth = 300
       object lblGeneralPort: TLabel
         AlignWithMargins = True
         Left = 15
@@ -93,7 +96,7 @@ object frmAppSettings: TfrmAppSettings
       end
       object edtPort: TEdit
         AlignWithMargins = True
-        Left = 238
+        Left = 243
         Top = 10
         Width = 47
         Height = 21
@@ -111,13 +114,14 @@ object frmAppSettings: TfrmAppSettings
         NumbersOnly = True
         ParentFont = False
         TabOrder = 0
+        ExplicitLeft = 238
         ExplicitHeight = 23
       end
     end
     object Panel8: TPanel
       Left = 2
       Top = 84
-      Width = 300
+      Width = 305
       Height = 41
       Align = alTop
       BevelOuter = bvNone
@@ -129,6 +133,7 @@ object frmAppSettings: TfrmAppSettings
       ParentFont = False
       ShowCaption = False
       TabOrder = 2
+      ExplicitWidth = 300
       object lblMinLogLevel: TLabel
         AlignWithMargins = True
         Left = 15
@@ -144,7 +149,7 @@ object frmAppSettings: TfrmAppSettings
       end
       object cbxMinimumLogLevel: TComboBox
         AlignWithMargins = True
-        Left = 140
+        Left = 145
         Top = 10
         Width = 145
         Height = 23
@@ -153,14 +158,70 @@ object frmAppSettings: TfrmAppSettings
         Margins.Bottom = 0
         Align = alRight
         TabOrder = 0
+        ExplicitLeft = 140
+      end
+    end
+    object Panel11: TPanel
+      Left = 2
+      Top = 125
+      Width = 305
+      Height = 41
+      Align = alTop
+      BevelOuter = bvNone
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+      ShowCaption = False
+      TabOrder = 3
+      ExplicitLeft = 3
+      ExplicitTop = 150
+      ExplicitWidth = 300
+      object lbl_MAX_CONCURRENT_CON: TLabel
+        AlignWithMargins = True
+        Left = 15
+        Top = 3
+        Width = 150
+        Height = 35
+        Margins.Left = 15
+        Align = alLeft
+        Alignment = taCenter
+        Caption = 'MAX_CONCURRENT_CONN'
+        Layout = tlCenter
+        ExplicitHeight = 15
+      end
+      object edtMaxConcurrentConnections: TEdit
+        AlignWithMargins = True
+        Left = 243
+        Top = 10
+        Width = 47
+        Height = 21
+        Margins.Left = 10
+        Margins.Top = 10
+        Margins.Right = 15
+        Margins.Bottom = 10
+        Align = alRight
+        Alignment = taCenter
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = 'Segoe UI Semibold'
+        Font.Style = [fsBold]
+        NumbersOnly = True
+        ParentFont = False
+        TabOrder = 0
+        ExplicitLeft = 238
+        ExplicitHeight = 23
       end
     end
   end
   object gbDatabase: TGroupBox
     AlignWithMargins = True
     Left = 10
-    Top = 152
-    Width = 304
+    Top = 192
+    Width = 309
     Height = 228
     Margins.Left = 0
     Margins.Top = 5
@@ -179,10 +240,12 @@ object frmAppSettings: TfrmAppSettings
     ParentFont = False
     ShowFrame = False
     TabOrder = 1
+    ExplicitTop = 152
+    ExplicitWidth = 304
     object Panel2: TPanel
       Left = 2
       Top = 101
-      Width = 300
+      Width = 305
       Height = 41
       Align = alTop
       BevelOuter = bvNone
@@ -194,6 +257,7 @@ object frmAppSettings: TfrmAppSettings
       ParentFont = False
       ShowCaption = False
       TabOrder = 0
+      ExplicitWidth = 300
       object lblDBPassword: TLabel
         AlignWithMargins = True
         Left = 15
@@ -209,7 +273,7 @@ object frmAppSettings: TfrmAppSettings
       end
       object edtDBPass: TEdit
         AlignWithMargins = True
-        Left = 186
+        Left = 191
         Top = 10
         Width = 99
         Height = 21
@@ -226,13 +290,14 @@ object frmAppSettings: TfrmAppSettings
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 0
+        ExplicitLeft = 186
         ExplicitHeight = 23
       end
     end
     object Panel3: TPanel
       Left = 2
       Top = 19
-      Width = 300
+      Width = 305
       Height = 41
       Align = alTop
       BevelOuter = bvNone
@@ -244,6 +309,7 @@ object frmAppSettings: TfrmAppSettings
       ParentFont = False
       ShowCaption = False
       TabOrder = 1
+      ExplicitWidth = 300
       object lblDatabaseFile: TLabel
         AlignWithMargins = True
         Left = 15
@@ -259,7 +325,7 @@ object frmAppSettings: TfrmAppSettings
       end
       object edtDatabaseFile: TEdit
         AlignWithMargins = True
-        Left = 146
+        Left = 151
         Top = 10
         Width = 139
         Height = 21
@@ -276,13 +342,14 @@ object frmAppSettings: TfrmAppSettings
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 0
+        ExplicitLeft = 146
         ExplicitHeight = 23
       end
     end
     object Panel4: TPanel
       Left = 2
       Top = 60
-      Width = 300
+      Width = 305
       Height = 41
       Align = alTop
       BevelOuter = bvNone
@@ -294,6 +361,7 @@ object frmAppSettings: TfrmAppSettings
       ParentFont = False
       ShowCaption = False
       TabOrder = 2
+      ExplicitWidth = 300
       object lblDBUser: TLabel
         AlignWithMargins = True
         Left = 15
@@ -309,7 +377,7 @@ object frmAppSettings: TfrmAppSettings
       end
       object edtDBUser: TEdit
         AlignWithMargins = True
-        Left = 186
+        Left = 191
         Top = 10
         Width = 99
         Height = 21
@@ -326,13 +394,14 @@ object frmAppSettings: TfrmAppSettings
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 0
+        ExplicitLeft = 186
         ExplicitHeight = 23
       end
     end
     object Panel5: TPanel
       Left = 2
       Top = 142
-      Width = 300
+      Width = 305
       Height = 41
       Align = alTop
       BevelOuter = bvNone
@@ -344,6 +413,7 @@ object frmAppSettings: TfrmAppSettings
       ParentFont = False
       ShowCaption = False
       TabOrder = 3
+      ExplicitWidth = 300
       object lblDBHost: TLabel
         AlignWithMargins = True
         Left = 15
@@ -359,7 +429,7 @@ object frmAppSettings: TfrmAppSettings
       end
       object edtHost: TEdit
         AlignWithMargins = True
-        Left = 186
+        Left = 191
         Top = 10
         Width = 99
         Height = 21
@@ -376,13 +446,14 @@ object frmAppSettings: TfrmAppSettings
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 0
+        ExplicitLeft = 186
         ExplicitHeight = 23
       end
     end
     object Panel6: TPanel
       Left = 2
       Top = 183
-      Width = 300
+      Width = 305
       Height = 41
       Align = alTop
       BevelOuter = bvNone
@@ -394,6 +465,7 @@ object frmAppSettings: TfrmAppSettings
       ParentFont = False
       ShowCaption = False
       TabOrder = 4
+      ExplicitWidth = 300
       object lblDBPort: TLabel
         AlignWithMargins = True
         Left = 15
@@ -409,7 +481,7 @@ object frmAppSettings: TfrmAppSettings
       end
       object edtDBPort: TEdit
         AlignWithMargins = True
-        Left = 238
+        Left = 243
         Top = 10
         Width = 47
         Height = 21
@@ -427,6 +499,7 @@ object frmAppSettings: TfrmAppSettings
         NumbersOnly = True
         ParentFont = False
         TabOrder = 0
+        ExplicitLeft = 238
         ExplicitHeight = 23
       end
     end
@@ -434,8 +507,8 @@ object frmAppSettings: TfrmAppSettings
   object gbSSL: TGroupBox
     AlignWithMargins = True
     Left = 10
-    Top = 395
-    Width = 304
+    Top = 435
+    Width = 309
     Height = 145
     Margins.Left = 0
     Margins.Top = 5
@@ -455,10 +528,12 @@ object frmAppSettings: TfrmAppSettings
     ParentFont = False
     ShowFrame = False
     TabOrder = 2
+    ExplicitTop = 395
+    ExplicitWidth = 304
     object Panel7: TPanel
       Left = 2
       Top = 60
-      Width = 300
+      Width = 305
       Height = 41
       Align = alTop
       BevelOuter = bvNone
@@ -470,6 +545,7 @@ object frmAppSettings: TfrmAppSettings
       ParentFont = False
       ShowCaption = False
       TabOrder = 0
+      ExplicitWidth = 300
       object lblRootCertPath: TLabel
         AlignWithMargins = True
         Left = 15
@@ -485,7 +561,7 @@ object frmAppSettings: TfrmAppSettings
       end
       object edtRootCertificatePath: TEdit
         AlignWithMargins = True
-        Left = 117
+        Left = 122
         Top = 10
         Width = 134
         Height = 21
@@ -502,11 +578,12 @@ object frmAppSettings: TfrmAppSettings
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 0
+        ExplicitLeft = 117
         ExplicitHeight = 23
       end
       object btnLoadFileRCrt: TButton
         AlignWithMargins = True
-        Left = 256
+        Left = 261
         Top = 10
         Width = 29
         Height = 21
@@ -518,12 +595,13 @@ object frmAppSettings: TfrmAppSettings
         Caption = '...'
         TabOrder = 1
         OnClick = btnLoadFileRCrtClick
+        ExplicitLeft = 256
       end
     end
     object Panel9: TPanel
       Left = 2
       Top = 19
-      Width = 300
+      Width = 305
       Height = 41
       Align = alTop
       BevelOuter = bvNone
@@ -535,6 +613,7 @@ object frmAppSettings: TfrmAppSettings
       ParentFont = False
       ShowCaption = False
       TabOrder = 1
+      ExplicitWidth = 300
       object lblCertPath: TLabel
         AlignWithMargins = True
         Left = 15
@@ -550,7 +629,7 @@ object frmAppSettings: TfrmAppSettings
       end
       object edtCertificatePath: TEdit
         AlignWithMargins = True
-        Left = 117
+        Left = 122
         Top = 10
         Width = 134
         Height = 21
@@ -567,11 +646,12 @@ object frmAppSettings: TfrmAppSettings
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 0
+        ExplicitLeft = 117
         ExplicitHeight = 23
       end
       object btnLoadFileSCrt: TButton
         AlignWithMargins = True
-        Left = 256
+        Left = 261
         Top = 10
         Width = 29
         Height = 21
@@ -583,12 +663,13 @@ object frmAppSettings: TfrmAppSettings
         Caption = '...'
         TabOrder = 1
         OnClick = btnLoadFileSCrtClick
+        ExplicitLeft = 256
       end
     end
     object Panel10: TPanel
       Left = 2
       Top = 101
-      Width = 300
+      Width = 305
       Height = 41
       Align = alTop
       BevelOuter = bvNone
@@ -600,6 +681,7 @@ object frmAppSettings: TfrmAppSettings
       ParentFont = False
       ShowCaption = False
       TabOrder = 2
+      ExplicitWidth = 300
       object lblKeyFilePath: TLabel
         AlignWithMargins = True
         Left = 15
@@ -615,7 +697,7 @@ object frmAppSettings: TfrmAppSettings
       end
       object edtKeyFile: TEdit
         AlignWithMargins = True
-        Left = 117
+        Left = 122
         Top = 10
         Width = 134
         Height = 21
@@ -632,11 +714,12 @@ object frmAppSettings: TfrmAppSettings
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 0
+        ExplicitLeft = 117
         ExplicitHeight = 23
       end
       object btnLoadKeyFile: TButton
         AlignWithMargins = True
-        Left = 256
+        Left = 261
         Top = 10
         Width = 29
         Height = 21
@@ -648,6 +731,7 @@ object frmAppSettings: TfrmAppSettings
         Caption = '...'
         TabOrder = 1
         OnClick = btnLoadKeyFileClick
+        ExplicitLeft = 256
       end
     end
   end
@@ -655,8 +739,8 @@ object frmAppSettings: TfrmAppSettings
     Tag = 12332
     AlignWithMargins = True
     Left = 110
-    Top = 553
-    Width = 104
+    Top = 592
+    Width = 109
     Height = 25
     Margins.Left = 100
     Margins.Right = 100
@@ -664,5 +748,7 @@ object frmAppSettings: TfrmAppSettings
     Caption = 'Salvar'
     TabOrder = 3
     OnClick = btnSaveConfigurationClick
+    ExplicitTop = 553
+    ExplicitWidth = 104
   end
 end

@@ -148,6 +148,7 @@ begin
   FServerState.WithLoggingViewer(memoLog);
   FServerState.WithMinimumLogLevel(ConfigurationData.MinimumLogLevel);
   FServerState.WithPort(ConfigurationData.Port);
+  FServerState.WithMaximumConnections(ConfigurationData.MaxConcurrentConnections);
 
   if ConfigurationData.SSL then
     FServerState.TryWithSSL();
