@@ -104,14 +104,18 @@ end;
 
 procedure TfrmMain.btnStopServerClick(Sender: TObject);
 begin
+  ShowMessage('Going Close Connection');
+  conn.Close;
+  ShowMessage('Connection Closed. Going to Stop Server');
   FServerState.StopServer;
+  ShowMessage('Connection Closed. Going to Stop Server');
   try
     FTickThread.Terminate;
     FTickThread := nil;
   except on E: Exception do
     memoLog.Lines.Add(Format(RES_LOG_STRING, [RES_APPLICATION_LOG, Now().ToString(), Format(RES_THREAD_ERROR, [E.Message])]));
   end;
-  ShowMessage('Going to Check if Server is Running');
+
   if not FServerState.IsServerRunning() then
   begin
     conn.Connected := False;
