@@ -2,7 +2,7 @@ unit Configuration;
 
 interface
 
-uses System.IOUtils, System.IniFiles, FireDAC.Comp.Client, System.SysUtils;
+uses System.IOUtils, System.IniFiles, FireDAC.Comp.Client, System.SysUtils, System.UITypes;
 
 type
   TNSDBConfig = record
@@ -72,23 +72,6 @@ const
   DEFAULT_SSL_ROOTCERTNAME = '';
   DEFAULT_SSL_CERTNAME = '';
   DEFAULT_SSL_KEYNAME = '';
-
-const
-    lsREQUESTBODY = 0;
-    lsQUERYBODY = 1;
-    lsREQUEST = 2;
-    lsINFORMATION = 3;
-    lsWARNING = 4;
-    lsERROR = 5;
-
-    LOG_SEVERITIES : array [0..5] of string = (
-    'REQUEST BODY (HTTP)',
-    'QUERY BODY (SQL)',
-    'ALERTA DE REQUISIÇÃO',
-    'INFORMAÇÕES',
-    'AVISOS',
-    'ERROS'
-    );
 
 var
   ConfigurationData: TNSConfiguration;
@@ -244,5 +227,7 @@ procedure TNSSSLConfig.SetRootCertificatePath(APath: String);
 begin
   RootCertificatePath := APath;
 end;
+
+
 
 end.

@@ -86,13 +86,12 @@ object frmAppSettings: TfrmAppSettings
         Left = 15
         Top = 3
         Width = 24
-        Height = 35
+        Height = 15
         Margins.Left = 15
         Align = alLeft
         Alignment = taCenter
         Caption = 'Port'
         Layout = tlCenter
-        ExplicitHeight = 15
       end
       object edtPort: TEdit
         AlignWithMargins = True
@@ -139,13 +138,12 @@ object frmAppSettings: TfrmAppSettings
         Left = 15
         Top = 3
         Width = 109
-        Height = 35
+        Height = 15
         Margins.Left = 15
         Align = alLeft
         Alignment = taCenter
         Caption = 'Minimum Log Level'
         Layout = tlCenter
-        ExplicitHeight = 15
       end
       object cbxMinimumLogLevel: TComboBox
         AlignWithMargins = True
@@ -158,7 +156,6 @@ object frmAppSettings: TfrmAppSettings
         Margins.Bottom = 0
         Align = alRight
         TabOrder = 0
-        ExplicitLeft = 140
       end
     end
     object Panel11: TPanel
@@ -184,13 +181,12 @@ object frmAppSettings: TfrmAppSettings
         Left = 15
         Top = 3
         Width = 150
-        Height = 35
+        Height = 15
         Margins.Left = 15
         Align = alLeft
         Alignment = taCenter
         Caption = 'MAX_CONCURRENT_CONN'
         Layout = tlCenter
-        ExplicitHeight = 15
       end
       object edtMaxConcurrentConnections: TEdit
         AlignWithMargins = True
@@ -263,13 +259,12 @@ object frmAppSettings: TfrmAppSettings
         Left = 15
         Top = 3
         Width = 52
-        Height = 35
+        Height = 15
         Margins.Left = 15
         Align = alLeft
         Alignment = taCenter
         Caption = 'Password'
         Layout = tlCenter
-        ExplicitHeight = 15
       end
       object edtDBPass: TEdit
         AlignWithMargins = True
@@ -315,13 +310,12 @@ object frmAppSettings: TfrmAppSettings
         Left = 15
         Top = 3
         Width = 51
-        Height = 35
+        Height = 15
         Margins.Left = 15
         Align = alLeft
         Alignment = taCenter
         Caption = 'Database'
         Layout = tlCenter
-        ExplicitHeight = 15
       end
       object edtDatabaseFile: TEdit
         AlignWithMargins = True
@@ -367,13 +361,12 @@ object frmAppSettings: TfrmAppSettings
         Left = 15
         Top = 3
         Width = 57
-        Height = 35
+        Height = 15
         Margins.Left = 15
         Align = alLeft
         Alignment = taCenter
         Caption = 'Username'
         Layout = tlCenter
-        ExplicitHeight = 15
       end
       object edtDBUser: TEdit
         AlignWithMargins = True
@@ -419,13 +412,12 @@ object frmAppSettings: TfrmAppSettings
         Left = 15
         Top = 3
         Width = 26
-        Height = 35
+        Height = 15
         Margins.Left = 15
         Align = alLeft
         Alignment = taCenter
         Caption = 'Host'
         Layout = tlCenter
-        ExplicitHeight = 15
       end
       object edtHost: TEdit
         AlignWithMargins = True
@@ -471,13 +463,12 @@ object frmAppSettings: TfrmAppSettings
         Left = 15
         Top = 3
         Width = 24
-        Height = 35
+        Height = 15
         Margins.Left = 15
         Align = alLeft
         Alignment = taCenter
         Caption = 'Port'
         Layout = tlCenter
-        ExplicitHeight = 15
       end
       object edtDBPort: TEdit
         AlignWithMargins = True
@@ -551,13 +542,12 @@ object frmAppSettings: TfrmAppSettings
         Left = 15
         Top = 3
         Width = 89
-        Height = 35
+        Height = 15
         Margins.Left = 15
         Align = alLeft
         Alignment = taCenter
         Caption = 'Root Certificate'
         Layout = tlCenter
-        ExplicitHeight = 15
       end
       object edtRootCertificatePath: TEdit
         AlignWithMargins = True
@@ -619,13 +609,12 @@ object frmAppSettings: TfrmAppSettings
         Left = 15
         Top = 3
         Width = 59
-        Height = 35
+        Height = 15
         Margins.Left = 15
         Align = alLeft
         Alignment = taCenter
         Caption = 'Certificate'
         Layout = tlCenter
-        ExplicitHeight = 15
       end
       object edtCertificatePath: TEdit
         AlignWithMargins = True
@@ -687,13 +676,12 @@ object frmAppSettings: TfrmAppSettings
         Left = 15
         Top = 3
         Width = 43
-        Height = 35
+        Height = 15
         Margins.Left = 15
         Align = alLeft
         Alignment = taCenter
         Caption = 'Key File'
         Layout = tlCenter
-        ExplicitHeight = 15
       end
       object edtKeyFile: TEdit
         AlignWithMargins = True

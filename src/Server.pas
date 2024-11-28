@@ -7,17 +7,15 @@ uses Vcl.StdCtrls, DateUtils, SysUtils, System.JSON, System.IOUtils,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client,
-  FireDAC.Phys.FB, FireDAC.Phys.FBDef, Vcl.Menus, FireDAC.Stan.Param,
+  FireDAC.Phys.FB, FireDAC.Phys.FBDef, Vcl.Menus, Vcl.ComCtrls, FireDAC.Stan.Param,
   FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet,
-  Horse, Horse.Jhonson, IdSSLOpenSSL, Configuration;
+  Horse, Horse.Jhonson, IdSSLOpenSSL, Configuration, Logging.Logger;
 
 resourcestring
   SCERTIFICATE_EXT = '.crt';
   SKEY_EXT = '.key';
 
 type
-
-
 
   TMLNotification = record
     ID_API: String;
@@ -34,12 +32,11 @@ type
   TAPINotificationServerState = class
   private
     FPort: Integer;
-    FLoggingViewer: TMemo;
     FResourcesRegistered: Boolean;
     FStartedDate: TDateTime;
     FMinimumLogLevel: Integer;
     FConnection: TFDConnection;
-    procedure WriteLog(ASeverity: Integer; AText: string);
+    FLogger: TLogger;
     procedure MercadoLibreNotify(AReq: THorseRequest; ARes: THorseResponse; ANext: TProc);
     procedure RegisterMercadoLibreNotification(ABody: TMLNotification);
     procedure NotificationServices(AReq: THorseRequest; ARes: THorseResponse; ANext: TProc);
@@ -49,7 +46,7 @@ type
     destructor Destroy(); override;
     procedure RegisterResources;
     function WithPort(APort: Integer): TAPINotificationServerState;
-    function WithLoggingViewer(AMemo: TMemo): TAPINotificationServerState;
+    function WithLog(AViewer: TLoggingTarget; ALevel: Integer): TAPINotificationServerState;
     function WithMinimumLogLevel(ALogLevel: Integer): TAPINotificationServerState;
     function WithMaximumConnections(AConns: Integer): TAPINotificationServerState;
     function TryWithSSL(): TAPINotificationServerState;
@@ -86,13 +83,13 @@ end;
 constructor TAPINotificationServerState.Create(AConn: TFDConnection);
 begin
   FPort := DEFAULT_SERVER_PORT;
-  FLoggingViewer := nil;
   FStartedDate := 0;
   FMinimumLogLevel := DEFAULT_MIN_LOG_LEVEL;
   FResourcesRegistered := False;
   FConnection := AConn;
   THorse.Use(Jhonson());
   THorse.KeepConnectionAlive := False;
+  FLogger := ApplicationLogger;
 end;
 
 destructor TAPINotificationServerState.Destroy;
@@ -118,17 +115,17 @@ var
   LBody: TJSONObject;
 begin
   ARes.Status(200).Send('ok'); {EARLY RESPONSE TO GAIN TIME}
-  WriteLog(lsREQUEST, Format(RES_MERCADOLIVRE_RECEIVED_NOTIFICATION, ['MercadoLivre'])); {LOGGING}
+  WriteLog(TLogSeverities.RequestReceived, Format(RES_MERCADOLIVRE_RECEIVED_NOTIFICATION, ['MercadoLivre'])); {LOGGING}
   try
     LBody := AReq.Body<TJSONObject>;
 
-    WriteLog(lsREQUESTBODY, LBody.ToString()); {LOGGING}
+    WriteLog(TLogSeverities.Uninportant, LBody.ToString()); {LOGGING}
 
     {FUNCTION BODY}
     BodyAdapter := TMLNotification.FromJSONObject(LBody);
     RegisterMercadoLibreNotification(BodyAdapter);
   except on E: Exception do
-    WriteLog(lsERROR, E.Message);
+    WriteLog(TLogSeverities.Error, E.Message);
   end;
 
 end;
@@ -141,7 +138,7 @@ begin
   RBody := TJSONObject.Create();
   RBody.AddPair('Received', True);
   ARes.Send<TJSONObject>(RBody);
-  WriteLog(lsREQUEST, Format(RES_MERCADOLIVRE_RECEIVED_NOTIFICATION, ['TestEndpoint']));
+  WriteLog(TLogSeverities.RequestReceived, Format(RES_MERCADOLIVRE_RECEIVED_NOTIFICATION, ['TestEndpoint']));
 end;
 
 function TAPINotificationServerState.IsServerRunning: Boolean;
@@ -153,12 +150,14 @@ procedure TAPINotificationServerState.RegisterMercadoLibreNotification(
   ABody: TMLNotification);
 var
   Query: TFDQuery;
+  Connection: TFDConnection;
   DateFormatSettings: TFormatSettings;
 begin
   DateFormatSettings.DateSeparator :='-';
   DateFormatSettings.ShortDateFormat := 'YYYY-MM-DD';
   Query := TFDQuery.Create(nil);
-  Query.Connection := FConnection;
+  Connection := TFDConnection(FConnection.CloneConnection());
+  Query.Connection := Connection;
   FConnection.StartTransaction();
   try
       Query.SQL.Text := 'INSERT INTO ML_NOTIFICACOES(ID_API, RESOURCE, USER_ID, TOPIC, APPLICATION_ID, ATTEMPTS, SENT, RECEIVED)VALUES('
@@ -176,17 +175,18 @@ begin
       Query.ExecSQL();
       FConnection.Commit;
       if Query.RowsAffected <> 0 then
-        WriteLog(lsINFORMATION, 'Notification ['+ABody.ID_API+'] Inserted')
+        WriteLog(TLogSeverities.Information, 'Notification ['+ABody.ID_API+'] Inserted')
       else
-        WriteLog(lsWARNING, 'Notification ['+ABody.ID_API+'] >NOT< Inserted')
+        WriteLog(TLogSeverities.Warning, 'Notification ['+ABody.ID_API+'] >NOT< Inserted')
     except on E: Exception do
     begin
       FConnection.Rollback;
-      WriteLog(lsERROR, Format(RES_ERROR_ON_DATA_INSERT, [E.Message]));
+      WriteLog(TLogSeverities.Error, Format(RES_ERROR_ON_DATA_INSERT, [E.Message]));
     end;
     end
   finally
     Query.Free;
+    Connection.Free;
   end;
 
 end;
@@ -200,22 +200,26 @@ end;
 procedure TAPINotificationServerState.StopServer;
 begin
   THorse.StopListen();
-  WriteLog(lsINFORMATION, RES_SERVER_STOPPED);
+  WriteLog(TLogSeverities.Information, RES_SERVER_STOPPED);
 end;
 
 procedure TAPINotificationServerState.StartServer;
 begin
   THorse.Listen(FPort);
   FStartedDate := Now();
-  WriteLog(lsINFORMATION, Format(RES_SERVER_STARTED,[THorse.Host, THorse.Port.ToString]));
+  WriteLog(TLogSeverities.Information, Format(RES_SERVER_STARTED,[THorse.Host, THorse.Port.ToString]));
 end;
 
-function TAPINotificationServerState.WithLoggingViewer(
-  AMemo: TMemo): TAPINotificationServerState;
+function TAPINotificationServerState.WithLog(AViewer: TLoggingTarget;
+  ALevel: Integer): TAPINotificationServerState;
 begin
-  FLoggingViewer := AMemo;
-  WriteLog(lsINFORMATION, RES_LOGGING_VIEWER_SET);
-  Result := Self;
+  FLogger.Target.RegisterTarget(AViewer.Target, AViewer.TargetType);
+  FLogger.Active := True;
+
+  if FLogger.Active then
+    WriteLog(TLogSeverities.Unknown, 'Logger Registered on ServerState', False)
+  else
+    raise Exception.Create('Logger Failed To Register');
 end;
 
 function TAPINotificationServerState.WithMaximumConnections(
@@ -228,7 +232,7 @@ end;
 function TAPINotificationServerState.WithMinimumLogLevel(
   ALogLevel: Integer): TAPINotificationServerState;
 begin
-  FMinimumLogLevel := ALogLevel;
+  FLogger.MinimumLevel := ALogLevel;
   Result := Self;
 end;
 
@@ -236,7 +240,7 @@ function TAPINotificationServerState.WithPort(
   APort: Integer): TAPINotificationServerState;
 begin
   FPort := APort;
-  WriteLog(lsINFORMATION, Format(RES_SERVER_PORT_SET, [IntToStr(APort)]));
+  WriteLog(TLogSeverities.Information, Format(RES_SERVER_PORT_SET, [IntToStr(APort)]));
   Result := Self;
 end;
 
@@ -245,7 +249,7 @@ begin
   Result := Self;
   if ExtensionFileExistsOnFolder(SCERTIFICATE_EXT) then
   begin
-    WriteLog(lsINFORMATION, RES_CERTIFICATE_FILE_FOUND);
+    WriteLog(TLogSeverities.Information, RES_CERTIFICATE_FILE_FOUND);
     const CertificateFile = ConfigurationData.SSLConfig.CertificatePath;
     if ExtensionFileExistsOnFolder(SKEY_EXT) then
     begin
@@ -258,39 +262,15 @@ begin
         .KeyFile(KeyFile)
         .SSLVersions([sslvSSLv2, sslvSSLv23, sslvSSLv3, sslvTLSv1, sslvTLSv1_1, sslvTLSv1_2])
         .Active(True);
-        WriteLog(lsINFORMATION, RES_CERTIFICATE_LOADED_ACTIVE);
+       WriteLog(TLogSeverities.Information, RES_CERTIFICATE_LOADED_ACTIVE);
       except on E: Exception do
-        WriteLog(lsINFORMATION, Format(RES_CERTIFICATE_LOAD_FAILED,[E.Message]));
+        WriteLog(TLogSeverities.Information, Format(RES_CERTIFICATE_LOAD_FAILED,[E.Message]));
       end;
     end else begin
-       WriteLog(lsWARNING, RES_KEY_FILE_NOT_FOUND);
+       WriteLog(TLogSeverities.Warning, RES_KEY_FILE_NOT_FOUND);
     end;
   end else begin
-    WriteLog(lsWARNING, RES_CERTIFICATE_FILE_NOT_FOUND);
-  end;
-end;
-
-{
-  Severity Levels Check on Consts Header.
-}
-procedure TAPINotificationServerState.WriteLog(ASeverity: Integer;
-  AText: string);
-begin
-  if Assigned(FLoggingViewer) and (ASeverity >= FMinimumLogLevel) then
-  begin
-    var DateNow: TDateTime := Now();
-    var SeverityString: String := '';
-    if ASeverity > lsREQUESTBODY then
-    begin
-      for var I := 1 to ASeverity do
-      begin
-        SeverityString := SeverityString + '!';
-      end;
-    end else begin
-      SeverityString := 'Body';
-    end;
-
-    FLoggingViewer.Lines.Add(Format(RES_LOG_STRING, [SeverityString, DateNow.ToString(), AText]));
+    WriteLog(TLogSeverities.Warning, RES_CERTIFICATE_FILE_NOT_FOUND);
   end;
 end;
 

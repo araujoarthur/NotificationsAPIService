@@ -3,22 +3,54 @@ unit Forms.Main;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.IOUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.IOUtils,
+  System.Variants,
+  System.Classes,
   System.DateUtils,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Server,
-  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
-  FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
-  FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client,
-  FireDAC.Phys.FB, FireDAC.Phys.FBDef, Vcl.Menus, FireDAC.Stan.Param,
-  FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet,
-  Vcl.AppEvnts, Vcl.ComCtrls, Configuration;
+  System.UITypes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.StdCtrls,
+  Vcl.ExtCtrls,
+  Vcl.Menus,
+  Vcl.AppEvnts,
+  Vcl.ComCtrls,
+  Server,
+  FireDAC.Stan.Intf,
+  FireDAC.Stan.Option,
+  FireDAC.Stan.Error,
+  FireDAC.UI.Intf,
+  FireDAC.Phys.Intf,
+  FireDAC.Stan.Def,
+  FireDAC.Stan.Pool,
+  FireDAC.Stan.Async,
+  FireDAC.Phys,
+  FireDAC.VCLUI.Wait,
+  Data.DB,
+  FireDAC.Comp.Client,
+  FireDAC.Phys.FB,
+  FireDAC.Phys.FBDef,
+  FireDAC.Stan.Param,
+  FireDAC.DatS,
+  FireDAC.DApt.Intf,
+  FireDAC.DApt,
+  FireDAC.Comp.DataSet,
+  scControls,
+  scStyledForm,
+  scGPControls,
+  Configuration,
+  Logging.Logger;
 
 type
   TTickThread = class;
 
   TfrmMain = class(TForm)
     btnStartServer: TButton;
-    memoLog: TMemo;
     Panel1: TPanel;
     btnStopServer: TButton;
     lblUptime: TLabel;
@@ -31,16 +63,22 @@ type
     Settings1: TMenuItem;
     ests1: TMenuItem;
     RefreshSettings1: TMenuItem;
+    scStyledForm1: TscStyledForm;
+    scGPButton1: TscGPButton;
+    richLog: TRichEdit;
+    pmLog: TPopupMenu;
+    RESVIEWLOGPROPERTIES1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure btnStartServerClick(Sender: TObject);
     procedure btnStopServerClick(Sender: TObject);
     procedure DatabaseFiretest1Click(Sender: TObject);
     procedure ApplicationEventsMinimize(Sender: TObject);
     procedure TrayIconDoubleClick(Sender: TObject);
-
     procedure SSLStartTest1Click(Sender: TObject);
     procedure Settings1Click(Sender: TObject);
     procedure RefreshSettings1Click(Sender: TObject);
+    procedure scGPButton1Click(Sender: TObject);
+    procedure RESVIEWLOGPROPERTIES1Click(Sender: TObject);
   private
     FServerState: TAPINotificationServerState;
     FTickThread: TTickThread;
@@ -96,9 +134,9 @@ begin
       btnStopServer.Enabled := True;
     end;
   except on E: Exception do
-    memoLog.Lines.Add(Format(RES_LOG_STRING, [RES_APPLICATION_LOG, Now().ToString(), Format(RES_STARTUP_ERROR, [E.Message])]));
+    WriteLog(TLogSeverities.Error, Format(RES_LOG_STRING, [RES_APPLICATION_LOG, Now().ToString(), Format(RES_STARTUP_ERROR, [E.Message])]));
   end;
-  
+
 
 end;
 
@@ -113,7 +151,7 @@ begin
     FTickThread.Terminate;
     FTickThread := nil;
   except on E: Exception do
-    memoLog.Lines.Add(Format(RES_LOG_STRING, [RES_APPLICATION_LOG, Now().ToString(), Format(RES_THREAD_ERROR, [E.Message])]));
+    WriteLog(TLogSeverities.Error, Format(RES_LOG_STRING, [RES_APPLICATION_LOG, Now().ToString(), Format(RES_THREAD_ERROR, [E.Message])]));
   end;
 
   if not FServerState.IsServerRunning() then
@@ -131,14 +169,12 @@ begin
     if conn.Connected then
     begin
       conn.Connected := False;
-      memoLog.Lines.Add(Format(RES_LOG_STRING, [RES_APPLICATION_LOG, Now().ToString(), RES_DATABASE_FIRETEST_SUCCESSFUL]));
+      WriteLog(TLogSeverities.Information, Format(RES_LOG_STRING, [RES_APPLICATION_LOG, Now().ToString(), RES_DATABASE_FIRETEST_SUCCESSFUL]));
     end;
 
   except on E: Exception do
-    memoLog.Lines.Add(Format(RES_LOG_STRING, [RES_APPLICATION_LOG, Now().ToString(), Format(RES_DATABASE_ERROR, [E.Message])]));
+    WriteLog(TLogSeverities.Error, Format(RES_LOG_STRING, [RES_APPLICATION_LOG, Now().ToString(), Format(RES_DATABASE_ERROR, [E.Message])]));
   end;
-
-
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
@@ -149,8 +185,11 @@ begin
   SetupTrayIcon;
   FServerState := TAPINotificationServerState.Create(conn);
   FServerState.RegisterResources();
-  FServerState.WithLoggingViewer(memoLog);
-  FServerState.WithMinimumLogLevel(ConfigurationData.MinimumLogLevel);
+
+  var LogTarg: TLoggingTarget;
+  LogTarg.RegisterTargetAsRichEdit(richLog);
+
+  FServerState.WithLog(LogTarg, ConfigurationData.MinimumLogLevel);
   FServerState.WithPort(ConfigurationData.Port);
   FServerState.WithMaximumConnections(ConfigurationData.MaxConcurrentConnections);
 
@@ -177,6 +216,19 @@ begin
 
 end;
 
+procedure TfrmMain.RESVIEWLOGPROPERTIES1Click(Sender: TObject);
+begin
+  ApplicationLogger.OutputProperties;
+end;
+
+procedure TfrmMain.scGPButton1Click(Sender: TObject);
+begin
+  if MessageDlg(RES_ARE_YOU_SURE_YOU_WANT + RES_BLANK + RES_KILL_SERVER + RES_QUESTION_MARK, mtConfirmation, [mbOk, mbCancel], 0)  = mrOk then
+  begin
+    Application.Terminate;
+  end;
+end;
+
 procedure TfrmMain.Settings1Click(Sender: TObject);
 begin
   frmAppSettings := TfrmAppSettings.Create(self);
@@ -198,6 +250,7 @@ begin
   ests1.Caption := RES_MAINMENU_TESTS_BUTTON;
   DatabaseFiretest1.Caption := RES_MAINMENU_DATABASEFIRETEST_BUTTON;
   SSLStartTest1.Caption := RES_MAINMENU_SSLSTARTTEST_BUTTON;
+  RESVIEWLOGPROPERTIES1.Caption := RES_VIEW_LOG_PROPERTIES;
 end;
 
 procedure TfrmMain.SetupTrayIcon;

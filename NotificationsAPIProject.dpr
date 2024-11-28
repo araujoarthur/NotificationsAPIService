@@ -8,7 +8,8 @@ uses
   Server in 'src\Server.pas',
   Configuration in 'src\Configuration.pas',
   Forms.ApplicationSettings in 'src\Forms.ApplicationSettings.pas' {frmAppSettings},
-  Localization.Resources in 'src\Localization.Resources.pas';
+  Localization.Resources in 'src\Localization.Resources.pas',
+  Logging.Logger in 'src\Logging.Logger.pas';
 
 {$R *.res}
 

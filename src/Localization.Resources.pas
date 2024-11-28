@@ -16,8 +16,12 @@ resourcestring
   RES_CERTIFICATE_LOAD_FAILED = 'Falha ao carregar Arquivo de Certificado: %s';
   RES_KEY_FILE_NOT_FOUND = 'O Arquivo de Chave de Assinatura do certificado não foi encontrado';
   RES_LOG_STRING = '[%s] [%s]   (%s)';
+  RES_LOG_STRING_STORAGE = '(%s, %s, %s)';
+  RES_LOG_STRING_COLORED = '||| [%s] - [%s]';
 
   //TERMS
+  RES_BLANK = ' ';
+  RES_QUESTION_MARK = '?';
   RES_LABEL_PORT = 'Porta';
   RES_USE_SSL_LABEL = 'Usar SSL';
   RES_MINLOGLEVEL_LABEL = 'Nível Mínimo de Log';
@@ -34,6 +38,9 @@ resourcestring
   RES_EXCEPTION_FILE_DOESNT_EXIST = 'O Arquivo Não Existe';
   RES_DISCARD_CHAGNES_QUERY = 'Você quer descartar todas as modificações?';
   RES_MAX_CONCURRENT_CONNECTIONS = 'Conexões Simultâneas';
+  RES_ARE_YOU_SURE_YOU_WANT = 'Você tem certeza que quer';
+  RES_ARE_YOU_SURE = 'Você tem certeza?';
+  RES_KILL_SERVER = 'Encerrar o Servidor';
 
 
 // MAIN FORM
@@ -57,6 +64,7 @@ resourcestring
   RES_APPLICATION_LOG = 'Log do Aplicativo';
   RES_THREAD_ERROR = 'Erro de Thread: %s';
   RES_STARTUP_ERROR = 'Erro de Inicialização: %s';
+  RES_VIEW_LOG_PROPERTIES = 'Ver Propriedades do Logger';
 
 
 

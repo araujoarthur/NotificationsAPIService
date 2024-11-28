@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, System.IOUtils;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, System.IOUtils, Logging.Logger;
 
 resourcestring
   CERTIFICATE_FILE_FILTER = 'Todos os Arquivos (*.crt, *.pem)|*.CRT;*.PEM|Arquivos PEM (*.pem)|*.PEM|Arquivos de Certificado (*.crt)|*.CRT';
@@ -196,9 +196,9 @@ end;
 
 procedure TfrmAppSettings.PopulateSeveritiesCheckBox;
 begin
-  for var I := 0 to Length(LOG_SEVERITIES)-1 do
+  for var I := 0 to Length(LOG_LEVELS)-1 do
   begin
-    cbxMinimumLogLevel.Items.Add(LOG_SEVERITIES[I])
+    cbxMinimumLogLevel.Items.Add(LOG_LEVELS[I])
   end;
 
 end;
