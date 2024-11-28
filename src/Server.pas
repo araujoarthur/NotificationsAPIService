@@ -159,27 +159,36 @@ begin
   DateFormatSettings.ShortDateFormat := 'YYYY-MM-DD';
   Query := TFDQuery.Create(nil);
   Query.Connection := FConnection;
-  Query.SQL.Text := 'INSERT INTO ML_NOTIFICACOES(ID_API, RESOURCE, USER_ID, TOPIC, APPLICATION_ID, ATTEMPTS, SENT, RECEIVED)VALUES('
-  + QUOTE_MARK + ABody.ID_API + QUOTE_MARK + ','
-  + QUOTE_MARK + ABody.Resource + QUOTE_MARK + ','
-  + IntToStr(ABody.USER_ID) + ','
-  + QUOTE_MARK + ABody.TOPIC + QUOTE_MARK + ','
-  + QUOTE_MARK + ABody.APPLICATION_ID + QUOTE_MARK + ','
-  + IntToStr(ABody.ATTEMPTS) + ','
-  + QUOTE_MARK + DateTimeToStr(ABody.SENT, DateFormatSettings) + QUOTE_MARK + ','
-  + QUOTE_MARK + DateTimeToStr(ABody.RECEIVED, DateFormatSettings) + QUOTE_MARK
-  +')';
+  FConnection.StartTransaction();
   try
+      Query.SQL.Text := 'INSERT INTO ML_NOTIFICACOES(ID_API, RESOURCE, USER_ID, TOPIC, APPLICATION_ID, ATTEMPTS, SENT, RECEIVED)VALUES('
+    + QUOTE_MARK + ABody.ID_API + QUOTE_MARK + ','
+    + QUOTE_MARK + ABody.Resource + QUOTE_MARK + ','
+    + IntToStr(ABody.USER_ID) + ','
+    + QUOTE_MARK + ABody.TOPIC + QUOTE_MARK + ','
+    + QUOTE_MARK + ABody.APPLICATION_ID + QUOTE_MARK + ','
+    + IntToStr(ABody.ATTEMPTS) + ','
+    + QUOTE_MARK + DateTimeToStr(ABody.SENT, DateFormatSettings) + QUOTE_MARK + ','
+    + QUOTE_MARK + DateTimeToStr(ABody.RECEIVED, DateFormatSettings) + QUOTE_MARK
+    +')';
+
     try
       Query.ExecSQL();
+      FConnection.Commit;
       if Query.RowsAffected <> 0 then
-        WriteLog(lsINFORMATION, 'Notification ['+ABody.ID_API+'] Inserted');
+        WriteLog(lsINFORMATION, 'Notification ['+ABody.ID_API+'] Inserted')
+      else
+        WriteLog(lsWARNING, 'Notification ['+ABody.ID_API+'] >NOT< Inserted')
     except on E: Exception do
+    begin
+      FConnection.Rollback;
       WriteLog(lsERROR, Format(RES_ERROR_ON_DATA_INSERT, [E.Message]));
+    end;
     end
   finally
     Query.Free;
   end;
+
 end;
 
 procedure TAPINotificationServerState.RegisterResources;
@@ -289,6 +298,8 @@ end;
 
 class function TMLNotification.FromJSONObject(
   AObj: TJSONObject): TMLNotification;
+var
+  DateString: String;
 begin
   AObj.TryGetValue('_id', Result.ID_API);
   AObj.TryGetValue('resource', Result.RESOURCE);
@@ -296,8 +307,11 @@ begin
   AObj.TryGetValue('topic', Result.TOPIC);
   AObj.TryGetValue('application_id', Result.APPLICATION_ID);
   AObj.TryGetValue('attempts', Result.ATTEMPTS);
-  AObj.TryGetValue('sent', Result.SENT);
-  AObj.TryGetValue('received', Result.RECEIVED);
+  AObj.TryGetValue('sent', DateString);
+  Result.SENT := ISO8601ToDate(DateString);
+  DateString := '';
+  AObj.TryGetValue('received', DateString);
+  Result.Received := ISO8601ToDate(DateString);
 end;
 
 end.
