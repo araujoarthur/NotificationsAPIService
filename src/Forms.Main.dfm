@@ -187,6 +187,7 @@ object frmMain: TfrmMain
     Top = 41
     Width = 557
     Height = 240
+    TabStop = False
     Align = alClient
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
@@ -196,9 +197,8 @@ object frmMain: TfrmMain
     ParentFont = False
     PopupMenu = pmLog
     ReadOnly = True
+    ScrollBars = ssVertical
     TabOrder = 1
-    ExplicitTop = 128
-    ExplicitHeight = 153
   end
   object MainMenu1: TMainMenu
     Left = 464

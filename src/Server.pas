@@ -3,7 +3,7 @@ unit Server;
 
 interface
 
-uses Vcl.StdCtrls, DateUtils, SysUtils, System.JSON, System.IOUtils,
+uses Vcl.StdCtrls, DateUtils, SysUtils, System.JSON, System.SyncObjs, System.IOUtils,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client,
@@ -151,8 +151,10 @@ var
   Connection: TFDConnection;
   DateFormatSettings: TFormatSettings;
 begin
-  DateFormatSettings.DateSeparator :='-';
+  DateFormatSettings.DateSeparator := '-';
+  DateFormatSettings.TimeSeparator := ':'; // Set the time separator
   DateFormatSettings.ShortDateFormat := 'YYYY-MM-DD';
+  DateFormatSettings.LongTimeFormat := 'HH:NN:SS'; // Include time format
   Query := TFDQuery.Create(nil);
   Connection := UtilFactory.GetConnection();
   try
@@ -287,9 +289,11 @@ begin
   AObj.TryGetValue('attempts', Result.ATTEMPTS);
   AObj.TryGetValue('sent', DateString);
   Result.SENT := ISO8601ToDate(DateString);
+  Result.SENT := IncHour(Result.SENT, -3);
   DateString := '';
   AObj.TryGetValue('received', DateString);
-  Result.Received := ISO8601ToDate(DateString);
+  Result.RECEIVED := ISO8601ToDate(DateString);
+  Result.RECEIVED := IncHour(Result.RECEIVED, -3);
 end;
 
 end.

@@ -113,12 +113,13 @@ type
 implementation
 
 uses
-  Configuration;
+  Configuration, Vcl.Dialogs;
 
 { Orphan Procedure }
 procedure WriteLog(ASeverity: TLogSeverity; AText: String;
   AWriteToDisk: Boolean);
 begin
+  //if ASeverity.Level = lsERROR then ShowMessage(AText);
   if Assigned(ApplicationLogger) then
     ApplicationLogger._WriteLog(ASeverity, AText, AWriteToDisk);
 end;
@@ -246,16 +247,14 @@ begin
     end else begin
       SeverityString := 'Body';
     end;
-    MemoTarget.Lines.Add(Format(RES_LOG_STRING, [SeverityString, DateNow.ToString, AText]));
-    MemoTarget.Lines.Add('');
+    MemoTarget.Lines.Add(Format(RES_LOG_STRING, [SeverityString, DateNow.ToString, AText])+sLineBreak);
   end
 
   else if FTarget.TargetType = ptRich then  // Writes on RichEdit
   begin
     var RichMemo := TRichEdit(FTarget.Target);
     RichMemo.SelAttributes.Color := ASeverity.Color;
-    RichMemo.Lines.Add(AText);
-    RichMemo.Lines.Add('');
+    RichMemo.Lines.Add(AText+sLineBreak);
   end;
 end;
 
