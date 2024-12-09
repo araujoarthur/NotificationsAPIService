@@ -41,6 +41,7 @@ resourcestring
   RES_ARE_YOU_SURE_YOU_WANT = 'Você tem certeza que quer';
   RES_ARE_YOU_SURE = 'Você tem certeza?';
   RES_KILL_SERVER = 'Encerrar o Servidor';
+  RES_START_RUNNING = 'Iniciar em Execução';
 
 
 // MAIN FORM

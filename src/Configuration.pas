@@ -35,6 +35,7 @@ type
     FDBConfig: TNSDBConfig;
     FSSLConfig: TNSSSLConfig;
     FMaxConcurrentConnections: Integer;
+    FStartRunning: Boolean;
   private
     function FileExistsOnFolder(AFileName: String): Boolean;
     procedure LoadFromFile(AFileName: String);
@@ -43,6 +44,7 @@ type
     procedure Save();
     procedure LoadDBConfigIntoConnection(const AConn: TFDConnection);
     property MaxConcurrentConnections: Integer read FMaxConcurrentConnections write FMaxConcurrentConnections;
+    property StartRunning: Boolean read FStartRunning write FStartRunning;
     property Port: Integer read FPort write FPort;
     property SSL: Boolean read FWithSSL write FWithSSL;
     property SSLConfig: TNSSSLConfig read FSSLConfig write FSSLConfig;
@@ -52,7 +54,6 @@ type
 
 const
   CONFIG_FILE_NAME = 'config.ini';
-  CONFIG_FILE_PATH = '.\' + CONFIG_FILE_NAME;
   SSL_SECTION_NAME = 'SSL';
   DATABASE_SECTION_NAME = 'DATABASE';
   GENERAL_SECTION_NAME = 'GENERAL';
@@ -60,6 +61,7 @@ const
   DEFAULT_SERVER_PORT = 5000;
   DEFAULT_SSL_USAGE = False;
   DEFAULT_MAX_CONCURRENT_CONNECTIONS = 100;
+  DEFAULT_START_RUNNING = False;
 
   DEFAULT_MIN_LOG_LEVEL = 0;
   DEFAULT_DB_USER = 'sysdba';
@@ -75,7 +77,7 @@ const
 
 var
   ConfigurationData: TNSConfiguration;
-
+  CONFIG_FILE_PATH: String;
 implementation
 
 uses VCL.Dialogs, Forms;
@@ -92,6 +94,7 @@ begin
     IniFile.WriteInteger(GENERAL_SECTION_NAME,'Port', DEFAULT_SERVER_PORT);
     IniFile.WriteBool(GENERAL_SECTION_NAME, 'SSL', DEFAULT_SSL_USAGE);
     IniFile.WriteInteger(GENERAL_SECTION_NAME, 'MaxConcurrentConnections', DEFAULT_MAX_CONCURRENT_CONNECTIONS);
+    IniFile.WriteBool(GENERAL_SECTION_NAME, 'StartRunning', DEFAULT_START_RUNNING);
 
     IniFile.WriteInteger(GENERAL_SECTION_NAME, 'MinimumLogLevel', DEFAULT_MIN_LOG_LEVEL);
     IniFile.WriteString(DATABASE_SECTION_NAME, 'Username', DEFAULT_DB_USER);
@@ -146,6 +149,7 @@ begin
   FPort := IniFile.ReadInteger(GENERAL_SECTION_NAME,'Port', DEFAULT_SERVER_PORT);
   FWithSSL := IniFile.ReadBool(GENERAL_SECTION_NAME, 'SSL', DEFAULT_SSL_USAGE);
   FMinimumLogLevel := IniFile.ReadInteger(GENERAL_SECTION_NAME, 'MinimumLogLevel', DEFAULT_MIN_LOG_LEVEL);
+  FStartRunning := IniFile.ReadBool(GENERAL_SECTION_NAME, 'StartRunning', DEFAULT_START_RUNNING);
 
   FMaxConcurrentConnections := IniFile.ReadInteger(GENERAL_SECTION_NAME, 'MaxConcurrentConnections', DEFAULT_MAX_CONCURRENT_CONNECTIONS);
   FDBConfig.Username := IniFile.ReadString(DATABASE_SECTION_NAME, 'Username',  '');
@@ -168,6 +172,7 @@ begin
   IniFile.WriteBool(GENERAL_SECTION_NAME, 'SSL', FWithSSL);
   IniFile.WriteInteger(GENERAL_SECTION_NAME, 'MinimumLogLevel', FMinimumLogLevel);
   IniFile.WriteInteger(GENERAL_SECTION_NAME, 'MaxConcurrentConnections', FMaxConcurrentConnections);
+  IniFile.WriteBool(GENERAL_SECTION_NAME, 'StartRunning', FStartRunning);
 
   IniFile.WriteString(DATABASE_SECTION_NAME, 'Username', FDBConfig.Username);
   IniFile.WriteString(DATABASE_SECTION_NAME, 'Password', FDBConfig.Password);
@@ -229,5 +234,9 @@ begin
 end;
 
 
+initialization
+
+CONFIG_FILE_PATH := ExtractFileDir(Application.ExeName) + '\' +  CONFIG_FILE_NAME;
+ShowMessage(CONFIG_FILE_PATH);
 
 end.

@@ -196,6 +196,9 @@ begin
 
   if ConfigurationData.SSL then
     FServerState.TryWithSSL();
+
+  if ConfigurationData.StartRunning then
+    btnStartServer.Click;
 end;
 
 procedure TfrmMain.RefreshSettings1Click(Sender: TObject);

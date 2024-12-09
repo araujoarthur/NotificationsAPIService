@@ -119,7 +119,6 @@ uses
 procedure WriteLog(ASeverity: TLogSeverity; AText: String;
   AWriteToDisk: Boolean);
 begin
-  //if ASeverity.Level = lsERROR then ShowMessage(AText);
   if Assigned(ApplicationLogger) then
     ApplicationLogger._WriteLog(ASeverity, AText, AWriteToDisk);
 end;

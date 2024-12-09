@@ -52,6 +52,7 @@ type
     Panel11: TPanel;
     lbl_MAX_CONCURRENT_CON: TLabel;
     edtMaxConcurrentConnections: TEdit;
+    cbStartRunning: TCheckBox;
     procedure btnLoadFileSCrtClick(Sender: TObject);
     procedure btnLoadFileRCrtClick(Sender: TObject);
     procedure btnLoadKeyFileClick(Sender: TObject);
@@ -100,6 +101,8 @@ begin
   ConfigurationData.Port := StrToInt(edtPort.Text);
   ConfigurationData.SSL := cbSSL.Checked;
   ConfigurationData.MinimumLogLevel := cbxMinimumLogLevel.ItemIndex;
+  ConfigurationData.MaxConcurrentConnections := StrToInt(edtMaxConcurrentConnections.Text);
+  ConfigurationData.StartRunning := cbStartRunning.Checked;
 
   ConfigurationData.DBParams.SetDatabase(edtDatabaseFile.Text);
   ConfigurationData.DBParams.SetUsername(edtDBUser.Text);
@@ -139,6 +142,8 @@ begin
   cbSSL.Checked := ConfigurationData.SSL;
   gbSSL.Enabled := ConfigurationData.SSL;
   edtMaxConcurrentConnections.Text := IntToStr(ConfigurationData.MaxConcurrentConnections);
+  cbStartRunning.Checked := ConfigurationData.StartRunning;
+
   edtCertificatePath.Text := ConfigurationData.SSLConfig.CertificatePath;
   edtRootCertificatePath.Text := ConfigurationData.SSLConfig.RootCertificatePath;
   edtKeyFile.Text := ConfigurationData.SSLConfig.CertificateKey;
@@ -219,6 +224,7 @@ begin
   Self.Caption := RES_SETTINGS;
   btnSaveConfiguration.Caption := RES_SAVE;
   lbl_MAX_CONCURRENT_CON.Caption := RES_MAX_CONCURRENT_CONNECTIONS;
+  cbStartRunning.Caption := RES_START_RUNNING;
 end;
 
 end.
