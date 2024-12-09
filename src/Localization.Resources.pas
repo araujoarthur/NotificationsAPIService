@@ -42,6 +42,7 @@ resourcestring
   RES_ARE_YOU_SURE = 'Você tem certeza?';
   RES_KILL_SERVER = 'Encerrar o Servidor';
   RES_START_RUNNING = 'Iniciar em Execução';
+  RES_VERIFY_CONFIG_PATH = 'Verificar Caminho do Arquivo de Configurações';
 
 
 // MAIN FORM

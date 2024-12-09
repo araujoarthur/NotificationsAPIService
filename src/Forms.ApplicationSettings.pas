@@ -4,7 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, System.IOUtils, Logging.Logger;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, System.IOUtils, Logging.Logger,
+  Vcl.Menus;
 
 resourcestring
   CERTIFICATE_FILE_FILTER = 'Todos os Arquivos (*.crt, *.pem)|*.CRT;*.PEM|Arquivos PEM (*.pem)|*.PEM|Arquivos de Certificado (*.crt)|*.CRT';
@@ -53,6 +54,9 @@ type
     lbl_MAX_CONCURRENT_CON: TLabel;
     edtMaxConcurrentConnections: TEdit;
     cbStartRunning: TCheckBox;
+    MainMenu1: TMainMenu;
+    CONFIGMMOPTIONS1: TMenuItem;
+    VERIFYCONFIGPATH1: TMenuItem;
     procedure btnLoadFileSCrtClick(Sender: TObject);
     procedure btnLoadFileRCrtClick(Sender: TObject);
     procedure btnLoadKeyFileClick(Sender: TObject);
@@ -60,6 +64,7 @@ type
     procedure cbSSLClick(Sender: TObject);
     procedure btnSaveConfigurationClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure VERIFYCONFIGPATH1Click(Sender: TObject);
   private
     { Private declarations }
     procedure SetupLocalization();
@@ -225,6 +230,13 @@ begin
   btnSaveConfiguration.Caption := RES_SAVE;
   lbl_MAX_CONCURRENT_CON.Caption := RES_MAX_CONCURRENT_CONNECTIONS;
   cbStartRunning.Caption := RES_START_RUNNING;
+  CONFIGMMOPTIONS1.Caption := RES_MAINMENU_TOOLS_BUTTON;
+  VERIFYCONFIGPATH1.Caption := RES_VERIFY_CONFIG_PATH;
+end;
+
+procedure TfrmAppSettings.VERIFYCONFIGPATH1Click(Sender: TObject);
+begin
+  ShowMessage(CONFIG_FILE_PATH);
 end;
 
 end.

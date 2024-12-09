@@ -3,7 +3,7 @@ object frmAppSettings: TfrmAppSettings
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'Settings'
-  ClientHeight = 659
+  ClientHeight = 664
   ClientWidth = 329
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
@@ -14,6 +14,7 @@ object frmAppSettings: TfrmAppSettings
   Padding.Left = 10
   Padding.Right = 10
   Padding.Bottom = 15
+  Menu = MainMenu1
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   TextHeight = 15
@@ -228,8 +229,6 @@ object frmAppSettings: TfrmAppSettings
       ParentFont = False
       TabOrder = 4
       OnClick = cbSSLClick
-      ExplicitLeft = 15
-      ExplicitTop = 162
     end
   end
   object gbDatabase: TGroupBox
@@ -255,7 +254,6 @@ object frmAppSettings: TfrmAppSettings
     ParentFont = False
     ShowFrame = False
     TabOrder = 1
-    ExplicitTop = 192
     object Panel2: TPanel
       Left = 2
       Top = 101
@@ -532,7 +530,6 @@ object frmAppSettings: TfrmAppSettings
     ParentFont = False
     ShowFrame = False
     TabOrder = 2
-    ExplicitTop = 435
     object Panel7: TPanel
       Left = 2
       Top = 60
@@ -733,7 +730,7 @@ object frmAppSettings: TfrmAppSettings
     Tag = 12332
     AlignWithMargins = True
     Left = 110
-    Top = 616
+    Top = 621
     Width = 109
     Height = 25
     Margins.Left = 100
@@ -742,6 +739,17 @@ object frmAppSettings: TfrmAppSettings
     Caption = 'Salvar'
     TabOrder = 3
     OnClick = btnSaveConfigurationClick
-    ExplicitTop = 592
+    ExplicitTop = 616
+  end
+  object MainMenu1: TMainMenu
+    Left = 210
+    Top = 21
+    object CONFIGMMOPTIONS1: TMenuItem
+      Caption = 'CONFIG_MM_OPTIONS'
+      object VERIFYCONFIGPATH1: TMenuItem
+        Caption = 'VERIFY_CONFIG_PATH'
+        OnClick = VERIFYCONFIGPATH1Click
+      end
+    end
   end
 end

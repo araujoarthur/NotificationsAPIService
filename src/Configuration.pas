@@ -237,6 +237,5 @@ end;
 initialization
 
 CONFIG_FILE_PATH := ExtractFileDir(Application.ExeName) + '\' +  CONFIG_FILE_NAME;
-ShowMessage(CONFIG_FILE_PATH);
 
 end.
