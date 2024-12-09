@@ -253,7 +253,12 @@ begin
   begin
     var RichMemo := TRichEdit(FTarget.Target);
     RichMemo.SelAttributes.Color := ASeverity.Color;
-    RichMemo.Lines.Add(AText+sLineBreak);
+    try
+      RichMemo.Lines.Add(AText+sLineBreak);
+    except on E: Exception do
+      // Yes, I just silenced it.
+    end;
+
   end;
 end;
 
