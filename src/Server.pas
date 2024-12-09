@@ -3,7 +3,7 @@ unit Server;
 
 interface
 
-uses Vcl.StdCtrls, DateUtils, SysUtils, System.JSON, System.SyncObjs, System.IOUtils,
+uses Vcl.StdCtrls, DateUtils, SysUtils, System.Classes, System.JSON, System.SyncObjs, System.IOUtils,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client,
@@ -121,7 +121,17 @@ begin
 
     {FUNCTION BODY}
     BodyAdapter := TMLNotification.FromJSONObject(LBody);
-    RegisterMercadoLibreNotification(BodyAdapter);
+    TThread.CreateAnonymousThread(
+      procedure
+      begin
+        try
+          RegisterMercadoLibreNotification(BodyAdapter);
+        except
+          on E: Exception do
+            WriteLog(TLogSeverities.Error, Format('Thread Error: %s', [E.Message]));
+        end;
+      end
+    ).Start;
   except on E: Exception do
     WriteLog(TLogSeverities.Error, E.Message);
   end;
