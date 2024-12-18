@@ -64,11 +64,12 @@ resourcestring
   RES_DATABASE_ERROR = 'Erro de Banco de Dados';
   RES_DATABASE_FIRETEST_SUCCESSFUL = 'Teste de inicialização de banco de dados bem sucedido!';
   RES_APPLICATION_LOG = 'Log do Aplicativo';
+  RES_VIEW_LOG_PROPERTIES = 'Ver Propriedades do Logger';
   RES_THREAD_ERROR = 'Erro de Thread: %s';
   RES_STARTUP_ERROR = 'Erro de Inicialização: %s';
-  RES_VIEW_LOG_PROPERTIES = 'Ver Propriedades do Logger';
 
-
+// GENERAL STRING TEMPLATES
+  RES_LOG_FILENAME = 'LOG-%s.txt';
 
 implementation
 

@@ -2,8 +2,8 @@ unit Logging.Logger;
 
 interface
 
-uses System.StrUtils, System.DateUtils, SysUtils, System.UITypes, Vcl.ComCtrls, Vcl.StdCtrls,
-Localization.Resources, NAPI.Utils;
+uses Windows, System.StrUtils, System.DateUtils, System.Classes, System.SyncObjs, SysUtils, System.UITypes, Vcl.ComCtrls, Vcl.StdCtrls,
+Localization.Resources, NAPI.Utils, IOUtils;
 
 type
   TPossibleTarget = (ptUnknown, ptMemo, ptRich);
@@ -63,19 +63,26 @@ type
 
   TLogger = class
   private
+    FCriticalSection: TCriticalSection;
     FActive: Boolean;
     FTarget: TLoggingTarget;
     FMinimumLogLevel: Integer;
+    FLoggerFileName: String;
+    FLoggerFile: TFile;
+    FLastLoggerFileStamp: TDateTime;
     procedure WriteLogToTarget(ASeverity: TLogSeverity; AText: String);
     procedure WriteLogToDisk(ASeverity: TLogSeverity; AText: String);
     procedure _WriteLog(ASeverity: TLogSeverity; AText: String; AWriteToDisk: Boolean = True);
     procedure SetActiveProp(T: Boolean);
+    function GenerateNewLogFile(): string;
+    function LoggerFilePath(): string;
     constructor Create();
   public
     property Active: Boolean read FActive write SetActiveProp;
     property Target: TLoggingTarget read FTarget;
     property MinimumLevel: Integer read FMinimumLogLevel write FMinimumLogLevel;
     procedure OutputProperties;
+    destructor Destroy(); override;
   end;
 
   const LOG_LEVELS: array of String = [
@@ -180,6 +187,46 @@ begin
   FActive := False;
   FTarget.Target := nil;
   FTarget.TargetType := ptUnknown;
+  FCriticalSection := TCriticalSection.Create;
+  GenerateNewLogFile();
+end;
+
+destructor TLogger.Destroy;
+begin
+  FCriticalSection.Free;
+  inherited;
+end;
+
+// Generates a New log file and if successful, sets the field FLoggerFileName to the new name and
+// the FLastLoggerFileStamp to the new stamp.
+function TLogger.GenerateNewLogFile: string;
+var
+  LogName: String;
+  FileHandle: THandle;
+  NewDateTime: TDateTime;
+begin
+  Result := '';
+  NewDateTime := Now;
+  LogName := Format(RES_LOG_FILENAME, [FormatDateTime('hhnnssddmmyyyy', NewDateTime)]);
+  try
+    FileHandle := FileCreate(LOGS_PATH_TRAILED + LogName);
+    if not (FileHandle = INVALID_HANDLE_VALUE) then
+    begin
+      FLoggerFileName := LogName;
+      FLastLoggerFileStamp := NewDateTime;
+      Result := LogName;
+    end
+  finally
+    if not(FileHandle = INVALID_HANDLE_VALUE) then
+    begin
+      CloseHandle(FileHandle);
+    end;
+  end;
+end;
+
+function TLogger.LoggerFilePath: string;
+begin
+
 end;
 
 procedure TLogger.OutputProperties;
@@ -226,7 +273,13 @@ end;
 
 procedure TLogger.WriteLogToDisk(ASeverity: TLogSeverity; AText: String);
 begin
-  // Must synchronize to avoid file race conditions
+  // Critical section ensures no two registers log on disk at the same time.
+  FCriticalSection.Enter;
+  try
+    // Check health of the file;
+  finally
+    FCriticalSection.Leave;
+  end;
 end;
 
 procedure TLogger.WriteLogToTarget(ASeverity: TLogSeverity; AText: String);
@@ -254,9 +307,14 @@ begin
     var RichMemo := TRichEdit(FTarget.Target);
     RichMemo.SelAttributes.Color := ASeverity.Color;
     try
-      RichMemo.Lines.Add(AText+sLineBreak);
+      // RichMemo.Lines.Add(AText+sLineBreak);
+      UtilFactory.CustomAddLineREdit(RichMemo, AText)
     except on E: Exception do
+      {$IFDEF DEBUG}
+        ShowMessage(E.Message);
+      {$ENDIF}
       // Yes, I just silenced it.
+      ShowMessage(E.Message);
     end;
 
   end;

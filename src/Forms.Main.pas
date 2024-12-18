@@ -79,13 +79,17 @@ type
     procedure RefreshSettings1Click(Sender: TObject);
     procedure scGPButton1Click(Sender: TObject);
     procedure RESVIEWLOGPROPERTIES1Click(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     FServerState: TAPINotificationServerState;
     FTickThread: TTickThread;
     FTrayIcon: TTrayIcon;
     FApplicationEvents: TApplicationEvents;
+    FFlagIsStartup: Boolean;
     procedure SetupTrayIcon;
     procedure SetupLocalization();
+    // The following procedure runs only on the first Show of the Main Form.
+    procedure ApplicationSetup();
   public
     { Public declarations }
     procedure UpdateTickerTime(ANewTime: TDateTime);
@@ -111,6 +115,8 @@ implementation
 uses Forms.ApplicationSettings, Localization.Resources;
 {$R *.dfm}
 
+{ TfrmMain }
+
 procedure TfrmMain.ApplicationEventsMinimize(Sender: TObject);
 begin
   Hide();
@@ -119,6 +125,23 @@ begin
   FTrayIcon.Visible := True;
   FTrayIcon.Animate := False;
   FTrayIcon.ShowBalloonHint;
+end;
+
+procedure TfrmMain.ApplicationSetup;
+begin
+  var LogTarg: TLoggingTarget;
+  LogTarg.RegisterTargetAsRichEdit(richLog);
+  FServerState.WithLog(LogTarg, ConfigurationData.MinimumLogLevel);
+  FServerState.WithPort(ConfigurationData.Port);
+  FServerState.WithMaximumConnections(ConfigurationData.MaxConcurrentConnections);
+
+  if ConfigurationData.SSL then
+    FServerState.TryWithSSL();
+
+  if ConfigurationData.StartRunning then
+    btnStartServer.Click;
+
+  FFlagIsStartup := False;
 end;
 
 procedure TfrmMain.btnStartServerClick(Sender: TObject);
@@ -181,24 +204,21 @@ end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
+  FFlagIsStartup := True;
   SetupLocalization();
   ConfigurationData := TNSConfiguration.Create();
   SetupTrayIcon;
   FServerState := TAPINotificationServerState.Create();
   FServerState.RegisterResources();
+end;
 
-  var LogTarg: TLoggingTarget;
-  LogTarg.RegisterTargetAsRichEdit(richLog);
-
-  FServerState.WithLog(LogTarg, ConfigurationData.MinimumLogLevel);
-  FServerState.WithPort(ConfigurationData.Port);
-  FServerState.WithMaximumConnections(ConfigurationData.MaxConcurrentConnections);
-
-  if ConfigurationData.SSL then
-    FServerState.TryWithSSL();
-
-  if ConfigurationData.StartRunning then
-    btnStartServer.Click;
+// Only set up visuals after the form is visible.
+procedure TfrmMain.FormShow(Sender: TObject);
+begin
+  if FFlagIsStartup then
+  begin
+    ApplicationSetup();
+  end;
 end;
 
 procedure TfrmMain.RefreshSettings1Click(Sender: TObject);

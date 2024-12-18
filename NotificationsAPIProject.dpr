@@ -20,4 +20,5 @@ begin
   Application.Title := 'Serviço de Notificações';
   Application.CreateForm(TfrmMain, frmMain);
   Application.Run;
+  UtilFactory.EnsureFolderExists(LOGS_PATH);
 end.

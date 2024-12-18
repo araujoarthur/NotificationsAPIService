@@ -78,6 +78,10 @@ const
 var
   ConfigurationData: TNSConfiguration;
   CONFIG_FILE_PATH: String;
+  LOGS_PATH: String;
+  LOGS_PATH_TRAILED: String;
+  APPLICATION_PATH: String;
+  APPLICATION_PATH_TRAILED: String;
 implementation
 
 uses VCL.Dialogs, Forms;
@@ -117,7 +121,7 @@ end;
 function TNSConfiguration.FileExistsOnFolder(AFileName: String): Boolean;
 begin
   Result := False;
-  var FolderFiles := TDirectory.GetFiles('.\');
+  var FolderFiles := TDirectory.GetFiles(APPLICATION_PATH);
   for var I := 0 to Length(FolderFiles) - 1 do
   begin
     if TPath.GetFileName(FolderFiles[I]) = AFileName then
@@ -236,6 +240,10 @@ end;
 
 initialization
 
-CONFIG_FILE_PATH := ExtractFileDir(Application.ExeName) + '\' +  CONFIG_FILE_NAME;
+APPLICATION_PATH := ExtractFileDir(Application.ExeName);
+APPLICATION_PATH_TRAILED := APPLICATION_PATH + '\';
+CONFIG_FILE_PATH := APPLICATION_PATH_TRAILED +  CONFIG_FILE_NAME;
+LOGS_PATH := APPLICATION_PATH_TRAILED + 'Logs';
+LOGS_PATH_TRAILED := LOGS_PATH + '\';
 
 end.

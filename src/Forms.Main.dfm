@@ -14,6 +14,7 @@ object frmMain: TfrmMain
   Font.Style = []
   Menu = MainMenu1
   OnCreate = FormCreate
+  OnShow = FormShow
   TextHeight = 15
   object Panel1: TPanel
     Left = 0
