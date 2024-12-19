@@ -112,8 +112,8 @@ var
   BodyAdapter: TMLNotification;
   LBody: TJSONObject;
 begin
-  ARes.Status(200).Send('ok'); {EARLY RESPONSE TO GAIN TIME}
   WriteLog(TLogSeverities.RequestReceived, Format(RES_MERCADOLIVRE_RECEIVED_NOTIFICATION, ['MercadoLivre'])); {LOGGING}
+  ARes.Status(200).Send('ok'); {EARLY RESPONSE TO GAIN TIME}
   try
     LBody := AReq.Body<TJSONObject>;
 

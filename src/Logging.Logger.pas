@@ -206,6 +206,7 @@ var
   NewDateTime: TDateTime;
 begin
   Result := '';
+  FileHandle := INVALID_HANDLE_VALUE;
   NewDateTime := Now;
   LogName := Format(RES_LOG_FILENAME, [FormatDateTime('hhnnssddmmyyyy', NewDateTime)]);
   try
@@ -217,7 +218,7 @@ begin
       Result := LogName;
     end
   finally
-    if not(FileHandle = INVALID_HANDLE_VALUE) then
+    if (not(FileHandle = INVALID_HANDLE_VALUE)) then
     begin
       CloseHandle(FileHandle);
     end;
@@ -226,7 +227,7 @@ end;
 
 function TLogger.LoggerFilePath: string;
 begin
-
+  Result := LOGS_PATH_TRAILED + FLoggerFileName;
 end;
 
 procedure TLogger.OutputProperties;
@@ -276,7 +277,27 @@ begin
   // Critical section ensures no two registers log on disk at the same time.
   FCriticalSection.Enter;
   try
-    // Check health of the file;
+    if HoursBetween(Now, FLastLoggerFileStamp) >= 2 then
+    begin
+       GenerateNewLogFile();
+    end;
+
+    // From here I just trust the above worked.
+
+    // Prepare the String
+    var LogString := Format(RES_DISK_LOG_TEMPLATE, [Now.ToString, IntToStr(ASeverity.Level), AText]);
+
+    // Opens the File
+    var LogStream := TFileStream.Create(LoggerFilePath(), fmOpenReadWrite or fmShareDenyNone);
+    var LogStringBytes: TBytes;
+    try
+      // Move o cursor para o final do arquivo.
+      LogStream.Seek(0, soEnd);   
+      LogStringBytes := TEncoding.UTF8.GetBytes(LogString+sLineBreak);
+      LogStream.WriteBuffer(LogStringBytes[0], Length(LogStringBytes));
+    finally
+      LogStream.Free;
+    end;
   finally
     FCriticalSection.Leave;
   end;

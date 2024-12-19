@@ -70,7 +70,7 @@ resourcestring
 
 // GENERAL STRING TEMPLATES
   RES_LOG_FILENAME = 'LOG-%s.txt';
-
+  RES_DISK_LOG_TEMPLATE = '%s'+#31+'%s'+#31+'%s' + #30; // Date of Log, Severity of Log, Text of Log
 implementation
 
 end.
