@@ -12,7 +12,7 @@ uses Vcl.StdCtrls, DateUtils, SysUtils, System.Classes, System.JSON, System.Sync
   Horse, Horse.Jhonson, IdSSLOpenSSL, Configuration, Logging.Logger, NAPI.Utils;
 
 resourcestring
-  SCERTIFICATE_EXT = '.crt';
+  SCERTIFICATE_EXT = '.pem';
   SKEY_EXT = '.key';
 
 type
@@ -39,7 +39,7 @@ type
     procedure MercadoLibreNotify(AReq: THorseRequest; ARes: THorseResponse; ANext: TProc);
     procedure RegisterMercadoLibreNotification(ABody: TMLNotification);
     procedure NotificationServices(AReq: THorseRequest; ARes: THorseResponse; ANext: TProc);
-    function ExtensionFileExistsOnFolder(AExt: String): Boolean;
+    function ExtensionFileExistsOnFolder(AFPath, AExt: String): Boolean;
   public
     constructor Create();
     destructor Destroy(); override;
@@ -62,13 +62,16 @@ type
 
 implementation
 
-uses Localization.Resources;
+uses Localization.Resources, VCL.Dialogs;
 { TAPINotificationServerState }
 
-function TAPINotificationServerState.ExtensionFileExistsOnFolder(AExt: String): Boolean;
+function TAPINotificationServerState.ExtensionFileExistsOnFolder(AFPath, AExt: String): Boolean;
 begin
   Result := False;
-  var FolderFiles := TDirectory.GetFiles('.\');
+
+  var FilesLoc := ExtractFilePath(AFPath);
+  var FolderFiles := TDirectory.GetFiles(FilesLoc);
+
   for var I := 0 to Length(FolderFiles) - 1 do
   begin
     if TPath.GetExtension(FolderFiles[i]) = AExt then
@@ -257,11 +260,11 @@ end;
 function TAPINotificationServerState.TryWithSSL: TAPINotificationServerState;
 begin
   Result := Self;
-  if ExtensionFileExistsOnFolder(SCERTIFICATE_EXT) then
+  if ExtensionFileExistsOnFolder(ConfigurationData.SSLConfig.CertificatePath, SCERTIFICATE_EXT) then
   begin
     WriteLog(TLogSeverities.Information, RES_CERTIFICATE_FILE_FOUND);
     const CertificateFile = ConfigurationData.SSLConfig.CertificatePath;
-    if ExtensionFileExistsOnFolder(SKEY_EXT) then
+    if (ExtractFileExt(ConfigurationData.SSLConfig.CertificateKey) = SCERTIFICATE_EXT) or (ExtensionFileExistsOnFolder(ConfigurationData.SSLConfig.CertificateKey, SKEY_EXT)) then
     begin
       const KeyFile = ConfigurationData.SSLConfig.CertificateKey;
       // Here it's guaranted that the SSL files exist.
