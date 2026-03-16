@@ -305,40 +305,44 @@ end;
 
 procedure TLogger.WriteLogToTarget(ASeverity: TLogSeverity; AText: String);
 begin
-  var DateNow: TDateTime := Now();
 
-  if FTarget.TargetType = ptMemo then  // Writes on Memo
-  begin
-    var MemoTarget := TMemo(FTarget.Target);
-    var SeverityString: String := '';
-    if ASeverity.Level > lsREQUESTBODY then
+  // Hopefully will avoid any WinAPI errors from now on
+  TThread.Queue(nil, procedure begin
+    var DateNow: TDateTime := Now();
+
+    if FTarget.TargetType = ptMemo then  // Writes on Memo
     begin
-      for var I := 1 to ASeverity.Level - 100 do
+
+      var SeverityString: String := '';
+      if ASeverity.Level > lsREQUESTBODY then
       begin
-        SeverityString := SeverityString + '!';
+        for var I := 1 to ASeverity.Level - 100 do
+        begin
+          SeverityString := SeverityString + '!';
+        end;
+      end else begin
+        SeverityString := 'Body';
       end;
-    end else begin
-      SeverityString := 'Body';
-    end;
-    MemoTarget.Lines.Add(Format(RES_LOG_STRING, [SeverityString, DateNow.ToString, AText])+sLineBreak);
-  end
 
-  else if FTarget.TargetType = ptRich then  // Writes on RichEdit
-  begin
-    var RichMemo := TRichEdit(FTarget.Target);
-    RichMemo.SelAttributes.Color := ASeverity.Color;
-    try
-      // RichMemo.Lines.Add(AText+sLineBreak);
-      UtilFactory.CustomAddLineREdit(RichMemo, AText)
-    except on E: Exception do
-      {$IFDEF DEBUG}
-        ShowMessage(E.Message);
-      {$ENDIF}
-      // Yes, I just silenced it.
-      ShowMessage(E.Message);
-    end;
+      var MemoTarget := TMemo(FTarget.Target);
+      MemoTarget.Lines.Add(Format(RES_LOG_STRING, [SeverityString, DateNow.ToString, AText])+sLineBreak);
+    end
 
-  end;
+    else if FTarget.TargetType = ptRich then  // Writes on RichEdit
+    begin
+      TThread.Synchronize(nil, procedure begin
+        var RichMemo := TRichEdit(FTarget.Target);
+        RichMemo.SelAttributes.Color := ASeverity.Color;
+        try
+          // RichMemo.Lines.Add(AText+sLineBreak);
+          UtilFactory.CustomAddLineREdit(RichMemo, AText)
+        except on E: Exception do
+          // Yes, I just silenced it.
+          ShowMessage(E.Message);
+        end;
+      end);
+    end;
+  end);
 end;
 
 { TLoggingTarget }
